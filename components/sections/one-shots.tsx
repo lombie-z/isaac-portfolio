@@ -192,27 +192,12 @@ export function OneShotsSection() {
           )}
         </motion.div>
 
-        {/* Glassy frosted fade on the left and right edges of the billboard.
-            The left panel has a soft oval cut-out where the controls sit, so
-            they read as a clear window punched out of the frosted glass. */}
+        {/* Glassy frosted fade on the left and right edges of the billboard */}
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[22%] bg-gradient-to-r from-white/40 to-transparent backdrop-blur-lg"
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[22%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
           style={{
-            // Edge fade MINUS a solid oval at the controls = a clear hole punched
-            // in the frost. Unprefixed only — mixing -webkit-mask-composite breaks it.
-            maskImage:
-              "linear-gradient(to right, black, transparent), radial-gradient(64px 128px at 76px 50%, black 58%, transparent 82%)",
-            maskComposite: "subtract",
-            maskRepeat: "no-repeat",
-          }}
-        />
-        {/* Cut-glass rim around the controls window */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-[12px] top-1/2 z-10 h-[256px] w-[128px] -translate-y-1/2 rounded-[50%]"
-          style={{
-            boxShadow:
-              "inset 0 1px 1px rgba(255,255,255,0.55), inset 0 0 0 1px rgba(255,255,255,0.22), inset 0 -8px 16px rgba(0,0,0,0.10)",
+            maskImage: "linear-gradient(to right, black, transparent)",
+            WebkitMaskImage: "linear-gradient(to right, black, transparent)",
           }}
         />
         <div
@@ -222,6 +207,29 @@ export function OneShotsSection() {
             WebkitMaskImage: "linear-gradient(to left, black, transparent)",
           }}
         />
+
+        {/* A crisp copy of the billboard, layered above the frost but revealed
+            only through the controls oval — a clean window into the sharp image
+            rather than a hole masked out of the blur. Same box + object-cover as
+            the base image, so it lines up pixel-for-pixel. */}
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden">
+          <div className="relative aspect-[2447/1531] w-full max-w-[1700px]">
+            <Image
+              src="/billboard/billboard-base.png"
+              alt=""
+              aria-hidden
+              fill
+              sizes="100vw"
+              className="object-cover"
+              style={{
+                maskImage: "radial-gradient(64px 128px at 76px 50%, black 70%, transparent 82%)",
+                WebkitMaskImage: "radial-gradient(64px 128px at 76px 50%, black 70%, transparent 82%)",
+                maskRepeat: "no-repeat",
+                WebkitMaskRepeat: "no-repeat",
+              }}
+            />
+          </div>
+        </div>
 
         {/* Section label */}
         <div className="pointer-events-none absolute left-8 top-10 z-20 max-w-sm">
