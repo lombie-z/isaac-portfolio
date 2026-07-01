@@ -2,13 +2,14 @@
 
 import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
+import type { IconType } from "react-icons";
 
 export type MarqueeCard = {
   title: string;
   kind: string;
   description?: string;
   image?: string;
-  icon?: LucideIcon;
+  icon?: LucideIcon | IconType;
 };
 
 /**

@@ -7,7 +7,8 @@
  * The real PrebuiltUI marquee-cards-with-hover-effect (see components/ui/
  * marquee-cards.tsx), fed Isaac's services + placeholder projects.
  */
-import { AppWindow, Component, Layers, ScanEye, SquareKanban } from "lucide-react";
+import { AppWindow, Component, Layers, ScanEye } from "lucide-react";
+import { FaPeopleLine } from "react-icons/fa6";
 import { type MarqueeCard, MarqueeCards } from "@/components/ui/marquee-cards";
 
 const CARDS: MarqueeCard[] = [
@@ -25,7 +26,7 @@ const CARDS: MarqueeCard[] = [
     kind: "Service",
     title: "Scrum Master",
     description: "Bring the most out of your teams with formal scrum practices.",
-    icon: SquareKanban,
+    icon: FaPeopleLine,
   },
   {
     kind: "Service",
