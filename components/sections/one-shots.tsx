@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp, CircleQuestionMark, Eye } from "lucide-react";
+import { ChevronDown, ChevronUp, CircleQuestionMark, ExternalLink } from "lucide-react";
 import { AnimatePresence, motion, useMotionTemplate, useScroll, useTransform } from "motion/react";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -234,7 +234,7 @@ export function OneShotsSection() {
               className="grid size-16 place-items-center rounded-full bg-brand text-brand-foreground shadow-lg shadow-brand/30 transition hover:brightness-110"
             >
               <span className="flex flex-col items-center leading-none">
-                <Eye className="size-5" />
+                <ExternalLink className="size-5" />
                 <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide">geez</span>
               </span>
             </a>
