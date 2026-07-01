@@ -32,11 +32,11 @@ const DEMOS: Demo[] = [
 
 // TODO(tune): fine-tune against the in-browser render.
 const POSTER = {
-  left: 44,
-  top: 24,
+  left: 44.2,
+  top: 25,
   width: 24,
-  height: 57,
-  rotateY: -13, // panel recedes to the right
+  height: 55,
+  rotateY: -12.5, // panel recedes to the right
   rotateZ: 0.4,
   perspective: 1400,
 };
