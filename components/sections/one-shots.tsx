@@ -194,14 +194,14 @@ export function OneShotsSection() {
 
         {/* Glassy frosted fade on the left and right edges of the billboard */}
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[14%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[22%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
           style={{
             maskImage: "linear-gradient(to right, black, transparent)",
             WebkitMaskImage: "linear-gradient(to right, black, transparent)",
           }}
         />
         <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[14%] bg-gradient-to-l from-white/25 to-transparent backdrop-blur-md"
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[22%] bg-gradient-to-l from-white/25 to-transparent backdrop-blur-md"
           style={{
             maskImage: "linear-gradient(to left, black, transparent)",
             WebkitMaskImage: "linear-gradient(to left, black, transparent)",
