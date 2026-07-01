@@ -64,34 +64,25 @@ function PosterFace({ demo, large }: { demo: Demo; large?: boolean }) {
 // (deviation from white, so the screenshot keeps its true colours) and a light
 // screen adds just the bright sheen that reads as glass.
 function PosterReflection() {
-  // Higher contrast makes the reflection read more (punchier highlights + darks)
-  // so the glass sheen can stay very subtle.
+  // Shift the (bright) reflection down so its mean sits near mid-grey, then blend
+  // with hard-light: grey areas read neutral (poster colour shows through),
+  // brights add glassy glare, darks add reflected structure — a visible
+  // reflection with no net wash. `contrast` controls how strong it reads.
   const style = {
     transform: "translateY(1.5%) scale(1.08)",
     transformOrigin: "left center",
-    filter: "contrast(1.7)",
+    filter: "brightness(0.68) contrast(1.25)",
   } as const;
   return (
-    <>
-      <Image
-        src="/billboard/billboard-reflection.png"
-        alt=""
-        aria-hidden
-        fill
-        sizes="40vw"
-        style={style}
-        className="pointer-events-none object-cover mix-blend-multiply"
-      />
-      <Image
-        src="/billboard/billboard-reflection.png"
-        alt=""
-        aria-hidden
-        fill
-        sizes="40vw"
-        style={style}
-        className="pointer-events-none object-cover opacity-10 mix-blend-screen"
-      />
-    </>
+    <Image
+      src="/billboard/billboard-reflection.png"
+      alt=""
+      aria-hidden
+      fill
+      sizes="40vw"
+      style={style}
+      className="pointer-events-none object-cover mix-blend-hard-light"
+    />
   );
 }
 
