@@ -111,8 +111,9 @@ export function OneShotsSection() {
   const paginate = (dir: 1 | -1) => setPage(([i]) => [(i + dir + DEMOS.length) % DEMOS.length, dir]);
 
   return (
-    <section ref={sectionRef} id="one-shots" className="relative h-[220vh] bg-background text-foreground">
-      <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
+    <section ref={sectionRef} id="one-shots" className="relative bg-background text-foreground md:h-[220vh]">
+      {/* Desktop: pinned billboard with rolling-window reveal + matrix3d poster */}
+      <div className="hidden h-screen items-center justify-center overflow-hidden md:sticky md:top-0 md:flex">
         {/* Pinned billboard, revealed bottom-up */}
         <motion.div
           ref={sceneRef}
@@ -264,6 +265,111 @@ export function OneShotsSection() {
               <ChevronDown className="size-5" />
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile: feature the poster itself, portrait — keeps the roll + seam + reflection */}
+      <div className="flex flex-col items-center gap-10 px-6 py-20 md:hidden">
+        <div className="w-full max-w-[340px]">
+          <h2 className="flex items-center gap-2 font-heading text-3xl font-semibold tracking-tight text-foreground">
+            One-Shot Websites
+            <span className="group relative inline-flex">
+              <button
+                type="button"
+                aria-label="What's a one-shot website?"
+                className="text-foreground/40 transition focus-visible:text-foreground/70 focus-visible:outline-none"
+              >
+                <CircleQuestionMark className="size-5" />
+              </button>
+              <span
+                role="tooltip"
+                className="pointer-events-none absolute left-0 top-full z-30 mt-2 w-56 rounded-lg bg-neutral-900 px-3 py-2 text-xs font-normal leading-snug text-white opacity-0 shadow-lg transition-opacity duration-200 group-focus-within:opacity-100"
+              >
+                Websites built with AI in only 1 or very few prompts
+              </span>
+            </span>
+          </h2>
+        </div>
+
+        <div className="relative aspect-[600/990] w-full max-w-[280px] overflow-hidden rounded-xl bg-black shadow-2xl">
+          <AnimatePresence custom={direction} initial={false}>
+            <motion.div
+              key={index}
+              custom={direction}
+              variants={posterVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={ROLL_TRANSITION}
+              className={`absolute inset-0 flex flex-col items-center justify-center gap-5 ${demo.bg} px-8 text-center`}
+            >
+              <div className={`size-10 rounded-2xl ${demo.accent}`} />
+              <span className="text-2xl font-bold tracking-tight text-white">{demo.name}</span>
+              <div className="h-2 w-2/3 rounded-full bg-white/20" />
+              <div className="h-2 w-1/2 rounded-full bg-white/20" />
+            </motion.div>
+          </AnimatePresence>
+
+          <Image
+            src="/billboard/billboard-reflection.png"
+            alt=""
+            aria-hidden
+            fill
+            sizes="80vw"
+            style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
+            className="pointer-events-none object-cover opacity-80 mix-blend-screen"
+          />
+
+          <AnimatePresence custom={direction} initial={false}>
+            <motion.div
+              key={`m-seam-${index}`}
+              custom={direction}
+              variants={posterVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={ROLL_TRANSITION}
+              className="pointer-events-none absolute inset-0"
+            >
+              <div
+                className="absolute inset-x-0 bottom-full h-[15%]"
+                style={{
+                  background: "linear-gradient(180deg,#080706 0%,#231f19 22%,#2c281f 50%,#231f19 78%,#080706 100%)",
+                }}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div className="flex items-center gap-5">
+          <button
+            type="button"
+            onClick={() => paginate(-1)}
+            aria-label="Previous site"
+            className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-foreground/70 shadow-md transition active:scale-95"
+          >
+            <ChevronUp className="size-5" />
+          </button>
+          <a
+            href={demo.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            aria-label={`Open ${demo.name}`}
+            className="grid size-16 place-items-center rounded-full bg-brand text-brand-foreground shadow-lg shadow-brand/30 transition active:scale-95"
+          >
+            <span className="flex flex-col items-center leading-none">
+              <ExternalLink className="size-5" />
+              <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide">open</span>
+            </span>
+          </a>
+          <button
+            type="button"
+            onClick={() => paginate(1)}
+            aria-label="Next site"
+            className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-foreground/70 shadow-md transition active:scale-95"
+          >
+            <ChevronDown className="size-5" />
+          </button>
         </div>
       </div>
     </section>
