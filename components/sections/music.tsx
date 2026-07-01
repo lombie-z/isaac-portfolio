@@ -25,16 +25,12 @@ export function MusicSection() {
       id="music"
       className="flex min-h-screen flex-col items-center justify-center gap-12 bg-background px-6 py-24 text-foreground"
     >
-      <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">Music</p>
-        <h2 className="font-heading text-4xl font-semibold tracking-tight md:text-6xl">Isaac Rozsa</h2>
-      </div>
+      <h2 className="font-heading text-4xl font-semibold tracking-tight md:text-6xl">Music Production</h2>
 
-      <MusicShowcase items={ITEMS} />
-
-      <p className="max-w-md text-center text-sm text-foreground/55">
-        I love AI but don&apos;t feel the need to use it for my music — this is all me and a few synths.
-      </p>
+      <MusicShowcase
+        items={ITEMS}
+        note="I love AI but don't feel the need to use it for my music — this is all me and a few synths."
+      />
     </section>
   );
 }

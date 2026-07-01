@@ -24,7 +24,7 @@ function Glyph({ item }: { item: MusicItem }) {
   return <Disc3 className="h-9 w-9" style={{ color: item.accent }} />;
 }
 
-export default function MusicShowcase({ items }: { items: MusicItem[] }) {
+export default function MusicShowcase({ items, note }: { items: MusicItem[]; note?: string }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const col1 = items.filter((_, i) => i % 3 === 0);
@@ -60,6 +60,7 @@ export default function MusicShowcase({ items }: { items: MusicItem[] }) {
         {items.map((item) => (
           <ItemRow key={item.id} item={item} hoveredId={hoveredId} onHover={setHoveredId} />
         ))}
+        {note && <p className="mt-3 max-w-xs text-xs leading-relaxed text-foreground/45">* {note}</p>}
       </div>
     </div>
   );

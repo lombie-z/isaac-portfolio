@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
+import { type MotionValue, motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 
 // Palettes from the original cosmos-spectrum component.
@@ -22,19 +22,31 @@ const PATHS = [
 ];
 
 /**
- * The cosmos-spectrum's signature gradient bars, rising on scroll into view.
- * (Uses the component's real SVG + gradients; the reveal is scoped with motion
- * instead of the original's page-global GSAP + fixed elements.)
+ * The cosmos-spectrum's signature blurred gradient bars, pinned to the bottom
+ * and popping up as you scroll. Pass `progress` (a 0→1 scroll MotionValue from a
+ * pinned/sticky parent) to drive the rise; otherwise it animates on its own as
+ * it scrolls into view. Uses the component's real SVG, gradients and blur.
  */
-export function CosmicSpectrum({ color = "original" }: { color?: keyof typeof THEMES }) {
+export function CosmicSpectrum({
+  color = "original",
+  blur = true,
+  progress,
+}: {
+  color?: keyof typeof THEMES;
+  blur?: boolean;
+  progress?: MotionValue<number>;
+}) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start start"] });
-  const scaleY = useTransform(scrollYProgress, [0, 0.7], [0.04, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 0.15], [0, 1]);
+  const own = useScroll({ target: ref, offset: ["start end", "start start"] });
+  const p = progress ?? own.scrollYProgress;
+
+  // Sit as a sliver, then pop up with momentum.
+  const scaleY = useTransform(p, [0, 0.5, 0.82, 1], [0.14, 0.22, 0.92, 1]);
+  const opacity = useTransform(p, [0, 0.06], [0, 1]);
   const colors = THEMES[color];
 
   return (
-    <div ref={ref} className="pointer-events-none absolute inset-x-0 bottom-0 h-[72%]">
+    <div ref={ref} className="pointer-events-none absolute inset-x-0 bottom-0 h-[74%]">
       <motion.svg
         style={{ scaleY, opacity, transformOrigin: "bottom" }}
         className="h-full w-full"
@@ -43,12 +55,23 @@ export function CosmicSpectrum({ color = "original" }: { color?: keyof typeof TH
         fill="none"
         aria-hidden
       >
-        <g clipPath="url(#spectrum-clip)">
+        <g clipPath="url(#spectrum-clip)" filter={blur ? "url(#spectrum-blur)" : undefined}>
           {PATHS.map((d, i) => (
             <path key={i} d={d} fill={`url(#spectrum-grad${i})`} />
           ))}
         </g>
         <defs>
+          <filter
+            id="spectrum-blur"
+            x="-30"
+            y="-30"
+            width="1627"
+            height="644"
+            filterUnits="userSpaceOnUse"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur stdDeviation="15" />
+          </filter>
           {Array.from({ length: 9 }, (_, i) => (
             <linearGradient
               key={i}

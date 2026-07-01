@@ -4,17 +4,17 @@
  * SECTION 6 — SOCIALS / END
  * Component: https://21st.dev/@aliimam/components/cosmos-spectrum
  *
- * Full-viewport finale: violet→dark background with the real cosmos-spectrum
- * gradient bars rising on scroll, behind two social icons rendered white and
- * glowing on hover.
+ * White finale on a tall, pinned stage: the real cosmos-spectrum gradient bars
+ * sit as a sliver at the bottom and pop up with scroll momentum behind a
+ * sign-off and the two socials (dark, violet glow on hover).
  */
 
-import { motion } from "motion/react";
+import { motion, useScroll } from "motion/react";
 import type { SVGProps } from "react";
+import { useRef } from "react";
 import { CosmicSpectrum } from "@/components/ui/cosmos-spectrum";
 
-// Brand marks are inlined as SVG: this lucide-react version no longer ships
-// the deprecated `Github` / `Linkedin` brand icons.
+// Brand marks inlined: this lucide-react version no longer ships Github/Linkedin.
 function Github(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" {...props}>
@@ -32,70 +32,52 @@ function Linkedin(props: SVGProps<SVGSVGElement>) {
 }
 
 const SOCIALS = [
-  {
-    label: "GitHub",
-    href: "https://github.com/isaaclombardssw",
-    Icon: Github,
-  },
-  {
-    label: "LinkedIn",
-    // TODO(isaac): replace with your real LinkedIn profile URL.
-    href: "https://www.linkedin.com/in/",
-    Icon: Linkedin,
-  },
+  { label: "GitHub", href: "https://github.com/isaaclombardssw", Icon: Github },
+  // TODO(isaac): replace with your real LinkedIn profile URL.
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/", Icon: Linkedin },
 ] as const;
 
 export function ConnectSection() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+
   return (
-    <section
-      id="connect"
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-brand via-brand-deep to-[#09040f] p-8 text-brand-foreground"
-    >
-      <CosmicSpectrum />
+    <section ref={ref} id="connect" className="relative h-[180vh] bg-background text-foreground">
+      <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden p-8">
+        <CosmicSpectrum color="original" blur progress={scrollYProgress} />
 
-      <div className="relative z-10 flex flex-col items-center gap-10 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="flex flex-col items-center gap-3"
-        >
-          <p className="text-sm font-medium uppercase tracking-[0.35em] text-brand-foreground/60">
-            The end &mdash; for now
-          </p>
-          <h2 className="font-heading text-4xl font-semibold tracking-tight md:text-6xl">
-            Let&apos;s connect
-          </h2>
-        </motion.div>
+        <div className="relative z-10 flex flex-col items-center gap-10 text-center">
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm font-medium uppercase tracking-[0.35em] text-foreground/50">
+              The end &mdash; for now
+            </p>
+            <h2 className="font-heading text-4xl font-semibold tracking-tight md:text-6xl">
+              Let&apos;s connect
+            </h2>
+          </div>
 
-        <motion.ul
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-          className="flex items-center gap-8"
-        >
-          {SOCIALS.map(({ label, href, Icon }) => (
-            <li key={label}>
-              <a
-                href={href}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={label}
-                className="group relative grid size-16 place-items-center rounded-full text-brand-foreground transition-transform duration-300 ease-out hover:scale-110 focus-visible:scale-110 focus-visible:outline-none md:size-20"
-              >
-                {/* Glow halo, revealed on hover/focus. */}
-                <span
-                  aria-hidden
-                  className="absolute inset-0 rounded-full opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
-                  style={{ background: "color-mix(in oklab, var(--brand-foreground) 70%, transparent)" }}
-                />
-                <Icon className="relative size-8 text-brand-foreground transition-[filter] duration-300 md:size-9 group-hover:[filter:drop-shadow(0_0_10px_rgba(255,255,255,0.9))] group-focus-visible:[filter:drop-shadow(0_0_10px_rgba(255,255,255,0.9))]" />
-              </a>
-            </li>
-          ))}
-        </motion.ul>
+          <ul className="flex items-center gap-8">
+            {SOCIALS.map(({ label, href, Icon }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={label}
+                  className="group relative grid size-16 place-items-center rounded-full text-foreground transition-transform duration-300 ease-out hover:scale-110 focus-visible:scale-110 focus-visible:outline-none md:size-20"
+                >
+                  {/* Violet glow halo, revealed on hover/focus. */}
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 rounded-full opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    style={{ background: "color-mix(in oklab, var(--brand) 45%, transparent)" }}
+                  />
+                  <Icon className="relative size-8 text-foreground transition-[filter] duration-300 md:size-9 group-hover:[filter:drop-shadow(0_0_12px_rgba(124,58,237,0.75))] group-focus-visible:[filter:drop-shadow(0_0_12px_rgba(124,58,237,0.75))]" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
