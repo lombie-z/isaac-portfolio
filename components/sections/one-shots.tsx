@@ -17,8 +17,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
  */
 
 // A demo is either a real site (screenshot `image` + `caption`) or a placeholder
-// mock (solid `bg` + `accent`) still awaiting its real screenshot.
-type Demo = { name: string; url: string; accent?: string; bg?: string; image?: string; caption?: string };
+// mock (solid `bg` + `accent`) still awaiting its real screenshot. `object` sets
+// the image framing (object-position) — default top-aligned.
+type Demo = {
+  name: string;
+  url: string;
+  accent?: string;
+  bg?: string;
+  image?: string;
+  caption?: string;
+  object?: string;
+};
 
 const DEMOS: Demo[] = [
   {
@@ -27,9 +36,13 @@ const DEMOS: Demo[] = [
     image: "/one-shots/magdalen-rozsa.jpg",
     caption: "Artist Portfolio with Integrated CMS",
   },
-  { name: "Northwind Coffee", url: "#", accent: "bg-amber-500", bg: "bg-amber-900" },
-  { name: "Halcyon Yoga", url: "#", accent: "bg-emerald-500", bg: "bg-emerald-900" },
-  { name: "Monolith Type", url: "#", accent: "bg-indigo-600", bg: "bg-indigo-900" },
+  {
+    name: "Chevro",
+    url: "https://chevro.iwrl.net/",
+    image: "/one-shots/chevro.jpg",
+    caption: "Real-time puzzle game",
+    object: "center",
+  },
 ];
 
 // The poster content — a real site screenshot with a caption band, or a
@@ -39,7 +52,12 @@ function PosterFace({ demo, large }: { demo: Demo; large?: boolean }) {
     return (
       <div className="absolute inset-0 flex flex-col bg-white">
         {/* biome-ignore lint/performance/noImgElement: warped poster art */}
-        <img src={demo.image} alt={demo.name} className="min-h-0 w-full flex-1 object-cover object-top" />
+        <img
+          src={demo.image}
+          alt={demo.name}
+          className="min-h-0 w-full flex-1 object-cover"
+          style={{ objectPosition: demo.object ?? "top" }}
+        />
         <div className={large ? "shrink-0 px-8 py-6" : "shrink-0 px-5 py-4"}>
           <p
             className={`text-center font-semibold leading-tight tracking-tight text-neutral-800 ${large ? "text-2xl" : "text-sm"}`}
