@@ -31,8 +31,8 @@ const DEMOS: Demo[] = [
 const CORNERS: [number, number][] = [
   [0.450, 0.318], // top-left
   [0.671, 0.326], // top-right
-  [0.668, 0.872], // bottom-right
-  [0.454, 0.902], // bottom-left
+  [0.671, 0.868], // bottom-right
+  [0.451, 0.897], // bottom-left
 ];
 
 // Reference (frontal) size the demo/reflection fill before being warped. Aspect
