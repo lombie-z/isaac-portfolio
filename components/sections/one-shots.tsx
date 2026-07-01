@@ -16,23 +16,23 @@ import { useEffect, useMemo, useRef, useState } from "react";
  * live 3D — so it doesn't bend as you scroll. Left controls cycle demos.
  */
 
-type Demo = { name: string; url: string; className: string };
+type Demo = { name: string; url: string; accent: string };
 
-// Placeholder demo sites — Isaac will replace with real screenshots + URLs.
+// Placeholder demo sites — light site mocks (Isaac replaces with real screenshots).
 const DEMOS: Demo[] = [
-  { name: "Aperture Studio", url: "#", className: "from-rose-400 via-fuchsia-500 to-indigo-600" },
-  { name: "Northwind Coffee", url: "#", className: "from-amber-300 via-orange-500 to-rose-500" },
-  { name: "Halcyon Yoga", url: "#", className: "from-emerald-300 via-teal-500 to-cyan-600" },
-  { name: "Monolith Type", url: "#", className: "from-zinc-200 via-zinc-400 to-zinc-700" },
+  { name: "Aperture Studio", url: "#", accent: "bg-rose-500" },
+  { name: "Northwind Coffee", url: "#", accent: "bg-amber-500" },
+  { name: "Halcyon Yoga", url: "#", accent: "bg-emerald-500" },
+  { name: "Monolith Type", url: "#", accent: "bg-indigo-600" },
 ];
 
 // Poster-panel corners as fractions of billboard-base.png — TL, TR, BR, BL.
 // The panel is a trapezoid (recedes to the right). TODO(tune) in-browser.
 const CORNERS: [number, number][] = [
-  [0.447, 0.331], // top-left
-  [0.672, 0.349], // top-right
-  [0.674, 0.858], // bottom-right
-  [0.447, 0.900], // bottom-left
+  [0.447, 0.323], // top-left
+  [0.680, 0.339], // top-right
+  [0.682, 0.867], // bottom-right
+  [0.447, 0.907], // bottom-left
 ];
 
 // Reference (frontal) size the demo/reflection fill before being warped. Aspect
@@ -118,8 +118,13 @@ export function OneShotsSection() {
               className="absolute left-0 top-0 overflow-hidden"
               style={{ width: REF_W, height: REF_H, transform: matrix, transformOrigin: "0 0" }}
             >
-              <div className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br ${demo.className}`}>
-                <span className="text-4xl font-semibold text-white/90 drop-shadow">{demo.name}</span>
+              <div className="absolute inset-0 bg-neutral-50">
+                <div className={`h-[14%] w-full ${demo.accent}`} />
+                <div className="flex h-[86%] flex-col items-center justify-center gap-4 px-10 text-center">
+                  <span className="text-4xl font-bold tracking-tight text-neutral-800">{demo.name}</span>
+                  <div className="h-2.5 w-1/2 rounded-full bg-neutral-200" />
+                  <div className="h-2.5 w-2/3 rounded-full bg-neutral-200" />
+                </div>
               </div>
               {/* Reflection — record-style screen-blend texture (rozsa) */}
               <Image
