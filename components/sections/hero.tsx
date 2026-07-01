@@ -93,7 +93,7 @@ export function HeroSection() {
             />
           </h1>
           <p className="max-w-[14ch] shrink-0 text-right text-sm font-medium tracking-wide text-brand-foreground/85 md:text-base">
-            Technical and creative consultant
+            UX, AI and software project consulting
           </p>
         </div>
 
