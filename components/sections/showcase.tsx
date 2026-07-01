@@ -7,11 +7,11 @@
  * The real PrebuiltUI marquee-cards-with-hover-effect (see components/ui/
  * marquee-cards.tsx), fed Isaac's services + placeholder projects.
  */
-import { Boxes, Layers, PenTool, Users } from "lucide-react";
+import { Boxes, PenTool, Users } from "lucide-react";
 import { type MarqueeCard, MarqueeCards } from "@/components/ui/marquee-cards";
 
 const CARDS: MarqueeCard[] = [
-  { kind: "Service", title: "TinaCMS — UI, UX & development", icon: Layers, gradient: "from-brand-muted via-brand to-brand-deep" },
+  { kind: "Worked on", title: "TinaCMS — UI, UX & development", image: "/work/tinacms.jpg" },
   { kind: "Project", title: "Project Alpha", placeholder: true, gradient: "from-fuchsia-500 via-brand to-indigo-700" },
   { kind: "Service", title: "Custom business solutions", icon: Boxes, gradient: "from-brand via-brand-deep to-brand-muted" },
   { kind: "Project", title: "Project Beta", placeholder: true, gradient: "from-indigo-500 via-brand-deep to-fuchsia-600" },
