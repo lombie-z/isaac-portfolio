@@ -220,7 +220,7 @@ export function OneShotsSection() {
                 fill
                 sizes="30vw"
                 style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
-                className="pointer-events-none object-cover opacity-40 mix-blend-screen"
+                className="pointer-events-none object-cover opacity-100 mix-blend-multiply"
               />
 
               {/* Seam: the black-ish gap between poster sheets, riding above the
@@ -350,7 +350,7 @@ export function OneShotsSection() {
             fill
             sizes="80vw"
             style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
-            className="pointer-events-none object-cover opacity-40 mix-blend-screen"
+            className="pointer-events-none object-cover opacity-100 mix-blend-multiply"
           />
 
           <AnimatePresence custom={direction} initial={false}>
