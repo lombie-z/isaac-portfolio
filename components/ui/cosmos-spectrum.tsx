@@ -1,346 +1,197 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
+/**
+ * CosmicSpectrum — self-contained cosmic backdrop for the CONNECT finale.
+ *
+ * Reimplemented from the 21st.dev @aliimam/cosmos-spectrum component.
+ * The original loaded GSAP + ScrollTrigger + TextPlugin from a CDN via
+ * injected <script> tags and poked window.gsap — fragile under Next's
+ * hydration / script ordering. This version has NO external scripts:
+ *   - a <canvas> starfield (drifting, twinkling points), and
+ *   - a "spectrum" equalizer of violet→light bars driven by `motion`.
+ *
+ * Purely decorative, so it is aria-hidden and pointer-events-none. It fills
+ * its positioned parent (absolute inset-0); the section supplies the brand
+ * background behind it.
+ */
+
+import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 interface CosmicSpectrumProps {
-  color?:
-    | "original"
-    | "blue-pink"
-    | "blue-orange"
-    | "sunset"
-    | "purple"
-    | "monochrome"
-    | "pink-purple"
-    | "blue-black"
-    | "beige-black"
-  blur?: boolean
+  className?: string;
+  /** Number of equalizer bars in the spectrum. */
+  barCount?: number;
 }
 
-export function CosmicSpectrum({ color = "original", blur = false }: CosmicSpectrumProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
+export function CosmicSpectrum({ className, barCount = 40 }: CosmicSpectrumProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
-  const colorThemes = {
-    original: ["#340B05", "#0358F7", "#5092C7", "#E1ECFE", "#FFD400", "#FA3D1D", "#FD02F5", "#FFC0FD"],
-    "blue-pink": ["#1E3A8A", "#3B82F6", "#A855F7", "#EC4899", "#F472B6", "#F9A8D4", "#FBCFE8", "#FDF2F8"],
-    "blue-orange": ["#1E40AF", "#3B82F6", "#60A5FA", "#FFFFFF", "#FED7AA", "#FB923C", "#EA580C", "#9A3412"],
-    sunset: ["#FEF3C7", "#FCD34D", "#F59E0B", "#D97706", "#B45309", "#92400E", "#78350F", "#451A03"],
-    purple: ["#F3E8FF", "#E9D5FF", "#D8B4FE", "#C084FC", "#A855F7", "#9333EA", "#7C3AED", "#6B21B6"],
-    monochrome: ["#1A1A1A", "#404040", "#666666", "#999999", "#CCCCCC", "#E5E5E5", "#F5F5F5", "#FFFFFF"],
-    "pink-purple": ["#FDF2F8", "#FCE7F3", "#F9A8D4", "#F472B6", "#EC4899", "#BE185D", "#831843", "#500724"],
-    "blue-black": ["#000000", "#0F172A", "#1E293B", "#334155", "#475569", "#64748B", "#94A3B8", "#CBD5E1"],
-    "beige-black": ["#FEF3C7", "#F59E0B", "#D97706", "#92400E", "#451A03", "#1C1917", "#0C0A09", "#000000"],
-  }
-
-  const darkThemes = ["blue-black", "beige-black", "monochrome"]
-  const isDarkTheme = darkThemes.includes(color)
-
+  // Starfield on a canvas — cheap, and independent of React re-renders.
   useEffect(() => {
-    // Load external scripts
-    const loadScript = (src: string) => {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement("script")
-        script.src = src
-        script.onload = resolve
-        script.onerror = reject
-        document.head.appendChild(script)
-      })
-    }
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    const initializeAnimations = async () => {
-      try {
-        await Promise.all([
-          loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"),
-          loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"),
-          loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"),
-        ])
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
 
-        // Wait a bit for scripts to be ready
-        setTimeout(() => {
-          if (window.gsap && window.ScrollTrigger) {
-            window.gsap.registerPlugin(window.ScrollTrigger)
-            setupAnimations()
-          }
-        }, 100)
-      } catch (error) {
-        console.error("Failed to load GSAP:", error)
-      }
-    }
+    type Star = {
+      x: number;
+      y: number;
+      z: number; // depth 0..1 → size + drift speed
+      phase: number; // twinkle offset
+      tint: number; // 0 = white, 1 = violet
+    };
+    let stars: Star[] = [];
 
-    initializeAnimations()
-  }, [])
+    const seed = () => {
+      const count = Math.min(220, Math.round((width * height) / 9000));
+      stars = Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random(),
+        phase: Math.random() * Math.PI * 2,
+        tint: Math.random(),
+      }));
+    };
 
-  const setupAnimations = () => {
-    const gsap = window.gsap
-    const ScrollTrigger = window.ScrollTrigger
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = Math.max(1, Math.round(width * dpr));
+      canvas.height = Math.max(1, Math.round(height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seed();
+    };
 
-    if (!gsap || !ScrollTrigger) return
+    resize();
 
-    // Hero animations
-    const heroTl = gsap.timeline({ delay: 0.5 })
+    let raf = 0;
+    let last = performance.now();
 
-    // Title animation
-    const titleChars = document.querySelectorAll(".hero-title .char")
-    if (titleChars.length > 0) {
-      gsap.set(titleChars, { opacity: 0, filter: "blur(8px)", x: -20 })
-      heroTl.to(
-        titleChars,
-        {
-          opacity: 1,
-          filter: "blur(0px)",
-          x: 0,
-          duration: 0.8,
-          stagger: 0.03,
-          ease: "power2.out",
-        },
-        0,
-      )
-    }
+    const draw = (now: number) => {
+      const dt = Math.min(64, now - last) / 1000;
+      last = now;
+      ctx.clearRect(0, 0, width, height);
 
-    // Nav items animation
-    const navItems = document.querySelectorAll(".hero-nav-item")
-    navItems.forEach((item) => {
-      gsap.set(item, { opacity: 0, y: 30, filter: "blur(8px)" })
-      heroTl.to(
-        item,
-        {
-          opacity: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: 0.8,
-          ease: "power2.out",
-        },
-        0.4,
-      )
-    })
-
-    // Text content animation
-    const textElements = document.querySelectorAll(".hero-text")
-    textElements.forEach((textEl, index) => {
-      gsap.set(textEl, { opacity: 0, y: 50, clipPath: "inset(0 0 100% 0)" })
-      heroTl.to(
-        textEl,
-        {
-          opacity: 1,
-          y: 0,
-          clipPath: "inset(0 0 0% 0)",
-          duration: 0.8,
-          ease: "power2.out",
-        },
-        0.8 + index * 0.2,
-      )
-    })
-
-    // Scroll hint animation
-    const scrollHintChars = document.querySelectorAll(".scroll-hint .char")
-    if (scrollHintChars.length > 0) {
-      gsap.set(scrollHintChars, { opacity: 0, filter: "blur(3px)" })
-      gsap.to(scrollHintChars, {
-        opacity: 1,
-        filter: "blur(0px)",
-        duration: 0.6,
-        stagger: { each: 0.08, repeat: -1, yoyo: true },
-        ease: "sine.inOut",
-        delay: 1,
-      })
-    }
-
-    // Scroll-triggered animations
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: ".animation-section",
-        start: "top bottom",
-        end: "bottom bottom",
-        scrub: 1,
-      },
-    })
-
-    const wavelengthLabels = document.querySelectorAll(".wavelength-label")
-    const mainTitle = document.querySelector(".main-title")
-
-    gsap.set([...wavelengthLabels, mainTitle], { opacity: 0, y: 30, filter: "blur(8px)" })
-
-    tl.to(".svg-container", { opacity: 1, duration: 0.01 }, 0)
-      .to(".text-grid", { opacity: 1, duration: 0.01 }, 0)
-      .to(".main-title", { opacity: 1, duration: 0.01 }, 0)
-      .to(
-        ".svg-container",
-        {
-          transform: "scaleY(0.05) translateY(-30px)",
-          duration: 0.3,
-          ease: "power2.out",
-        },
-        0,
-      )
-      .to(
-        ".svg-container",
-        {
-          transform: "scaleY(1) translateY(0px)",
-          duration: 1.2,
-          ease: "power2.out",
-        },
-        0.3,
-      )
-      .to(
-        ".nav-bottom-left, .nav-bottom-right, .nav-bottom-center",
-        {
-          opacity: 0,
-          duration: 0.6,
-          ease: "power2.out",
-        },
-        0.2,
-      )
-      .to(
-        [...wavelengthLabels, mainTitle],
-        {
-          duration: 0.8,
-          y: 0,
-          opacity: 1,
-          filter: "blur(0px)",
-          stagger: 0.08,
-          ease: "power2.out",
-        },
-        0.9,
-      )
-      .to(".level-5", { y: "-25vh", duration: 0.8, ease: "power2.out" }, 0.9)
-      .to(".level-4", { y: "-20vh", duration: 0.8, ease: "power2.out" }, 0.9)
-      .to(".level-3", { y: "-15vh", duration: 0.8, ease: "power2.out" }, 0.9)
-      .to(".level-2", { y: "-10vh", duration: 0.8, ease: "power2.out" }, 0.9)
-      .to(".level-1", { y: "-5vh", duration: 0.8, ease: "power2.out" }, 0.9)
-
-    // Refresh on resize
-    window.addEventListener("resize", () => ScrollTrigger.refresh())
-  }
-
-  const splitText = (text: string, className = "") => {
-    return text.split("").map((char, index) => (
-      <span key={index} className={`char ${className}`}>
-        {char === " " ? "\u00A0" : char}
-      </span>
-    ))
-  }
-
-  const currentColors = colorThemes[color]
-
-  return (
-    <div ref={containerRef} className="relative min-h-screen overflow-x-hidden">
-      {/* Gradient Overlay */}
-      <div
-        className="gradient-overlay fixed top-20 left-0 w-screen h-screen pointer-events-none z-[5] opacity-0 transition-opacity duration-600"
-        style={{ filter: "blur(60px)" }}
-      />
- 
-
-      {/* Hero Section */}
-      <section className="h-screen w-full p-8 flex flex-col justify-center relative">
-           <h1 className="text-center text-7xl font-bold tracking-tighter transition-colors duration-300">
-          {splitText("Cosmos Spectrum")}
-        </h1>
-      </section>
-
-       <div className="nav-bottom-center fixed bottom-8 left-1/2 transform -translate-x-1/2 z-[1000] pointer-events-auto text-xs uppercase tracking-wide transition-colors duration-300 scroll-hint">
-            {splitText("Scroll to explore")}
-          </div>
-      <div className="h-[50vh]" />
-
-      {/* Animation Section */}
-      <div className="animation-section h-screen relative">
-        <div className="fixed bottom-0 left-0 right-0 h-screen pointer-events-none z-10">
-          {/* SVG Container */}
-          <div
-            className="svg-container absolute bottom-0 left-0 right-0 h-screen opacity-0 z-[15]"
-            style={{
-              transformOrigin: "bottom",
-              transform: "scaleY(0.05) translateY(100vh)",
-              willChange: "transform, opacity, filter",
-            }}
-          >
-            <svg className="w-full h-full" viewBox="0 0 1567 584" preserveAspectRatio="none" fill="none">
-              <g clipPath="url(#clip)" filter={blur ? "url(#blur)" : undefined}>
-                <path d="M1219 584H1393V184H1219V584Z" fill="url(#grad0)" />
-                <path d="M1045 584H1219V104H1045V584Z" fill="url(#grad1)" />
-                <path d="M348 584H174L174 184H348L348 584Z" fill="url(#grad2)" />
-                <path d="M522 584H348L348 104H522L522 584Z" fill="url(#grad3)" />
-                <path d="M697 584H522L522 54H697L697 584Z" fill="url(#grad4)" />
-                <path d="M870 584H1045V54H870V584Z" fill="url(#grad5)" />
-                <path d="M870 584H697L697 0H870L870 584Z" fill="url(#grad6)" />
-                <path d="M174 585H0.000183105L-3.75875e-06 295H174L174 585Z" fill="url(#grad7)" />
-                <path d="M1393 584H1567V294H1393V584Z" fill="url(#grad8)" />
-              </g>
-              <defs>
-                <filter
-                  id="blur"
-                  x="-30"
-                  y="-30"
-                  width="1627"
-                  height="644"
-                  filterUnits="userSpaceOnUse"
-                  colorInterpolationFilters="sRGB"
-                >
-                  <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                  <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-                  <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur" />
-                </filter>
-                {Array.from({ length: 9 }, (_, i) => (
-                  <linearGradient
-                    key={i}
-                    id={`grad${i}`}
-                    x1="50%"
-                    y1="100%"
-                    x2="50%"
-                    y2="0%"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor={currentColors[0]} />
-                    <stop offset="0.182709" stopColor={currentColors[1]} />
-                    <stop offset="0.283673" stopColor={currentColors[2]} />
-                    <stop offset="0.413484" stopColor={currentColors[3]} />
-                    <stop offset="0.586565" stopColor={currentColors[4]} />
-                    <stop offset="0.682722" stopColor={currentColors[5]} />
-                    <stop offset="0.802892" stopColor={currentColors[6]} />
-                    <stop offset="1" stopColor={currentColors[7]} stopOpacity="0" />
-                  </linearGradient>
-                ))}
-                <clipPath id="clip">
-                  <rect width="1567" height="584" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
-          </div>
-
-          {/* Main Title */}
-          <div
-            className="main-title absolute bottom-1/2 left-1/2 transform translate-x-[-50%] translate-y-1/2 text-center text-xs leading-relaxed z-20 opacity-0 transition-colors duration-300"
-            style={{ color: isDarkTheme ? "#ffffff" : "#333" }}
-          >
-            Where Design Becomes Communication
-            <br />
-            Across the World
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Styles */}
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .hero-title {
-            font-size: 12vw !important;
-            margin-top: 2rem !important;
-          }
-          .hero-content {
-            flex-direction: column !important;
-            gap: 1.5rem !important;
-            margin-top: 2rem !important;
-          }
-          .hero-text-content {
-            flex-direction: column !important;
-            gap: 1.5rem !important;
-          }
-          .hero-text {
-            width: 100% !important;
-            font-size: 10px !important;
+      for (const s of stars) {
+        // Gentle upward drift; deeper stars move slower. Wrap around.
+        if (!prefersReducedMotion) {
+          s.y -= (0.6 + s.z * 2.4) * dt * 12;
+          if (s.y < -2) {
+            s.y = height + 2;
+            s.x = Math.random() * width;
           }
         }
-      `}</style>
+
+        const twinkle = prefersReducedMotion
+          ? 0.7
+          : 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(now / 900 + s.phase));
+        const size = 0.4 + s.z * 1.7;
+        const alpha = (0.25 + s.z * 0.6) * twinkle;
+
+        // Blend white → soft violet for a cosmic, on-brand feel.
+        const r = Math.round(255 - s.tint * 55);
+        const g = Math.round(255 - s.tint * 120);
+        const b = 255;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        ctx.fill();
+      }
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    raf = requestAnimationFrame(draw);
+    window.addEventListener("resize", resize);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, [prefersReducedMotion]);
+
+  // Spectrum bars — a smooth arch of heights with a per-bar breathing loop.
+  const bars = Array.from({ length: barCount }, (_, i) => {
+    const t = i / (barCount - 1); // 0..1
+    // Arch: tall in the middle, short at the edges.
+    const arch = Math.sin(t * Math.PI);
+    const jitter = 0.75 + 0.25 * Math.sin(i * 12.9898);
+    const base = 14 + arch * 62 * jitter; // % of container height
+    return {
+      id: `spectrum-bar-${i}`,
+      base,
+      delay: t * 0.9 + (i % 3) * 0.12,
+      duration: 3.4 + (i % 5) * 0.35,
+    };
+  });
+
+  return (
+    <div
+      aria-hidden
+      className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}
+    >
+      {/* Depth: darker toward the edges, glow toward the horizon. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 80% at 50% 12%, color-mix(in oklab, var(--brand-muted) 55%, transparent) 0%, transparent 55%)",
+        }}
+      />
+
+      {/* Starfield */}
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+
+      {/* Spectrum equalizer along the bottom */}
+      <div className="absolute inset-x-0 bottom-0 flex h-[46%] items-end justify-center gap-[0.4%] px-[4%]">
+        {bars.map((bar) => (
+          <motion.div
+            key={bar.id}
+            className="flex-1 rounded-t-full"
+            style={{
+              background:
+                "linear-gradient(to top, var(--brand-deep) 0%, var(--brand-muted) 45%, color-mix(in oklab, var(--brand-foreground) 90%, var(--brand-muted)) 100%)",
+              filter: "drop-shadow(0 0 6px color-mix(in oklab, var(--brand-muted) 70%, transparent))",
+            }}
+            initial={{ height: `${bar.base}%`, opacity: 0.55 }}
+            animate={
+              prefersReducedMotion
+                ? { height: `${bar.base}%`, opacity: 0.6 }
+                : {
+                    height: [`${bar.base}%`, `${bar.base * 1.32}%`, `${bar.base * 0.82}%`, `${bar.base}%`],
+                    opacity: [0.5, 0.9, 0.6, 0.5],
+                  }
+            }
+            transition={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    duration: bar.duration,
+                    delay: bar.delay,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut",
+                  }
+            }
+          />
+        ))}
+      </div>
+
+      {/* Soft fade at the very bottom so bars melt into the section. */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-24"
+        style={{
+          background: "linear-gradient(to top, var(--brand-deep), transparent)",
+        }}
+      />
     </div>
-  )
+  );
 }
