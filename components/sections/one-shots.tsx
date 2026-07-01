@@ -192,6 +192,22 @@ export function OneShotsSection() {
           )}
         </motion.div>
 
+        {/* Glassy frosted fade on the left and right edges of the billboard */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[14%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
+          style={{
+            maskImage: "linear-gradient(to right, black, transparent)",
+            WebkitMaskImage: "linear-gradient(to right, black, transparent)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[14%] bg-gradient-to-l from-white/25 to-transparent backdrop-blur-md"
+          style={{
+            maskImage: "linear-gradient(to left, black, transparent)",
+            WebkitMaskImage: "linear-gradient(to left, black, transparent)",
+          }}
+        />
+
         {/* Section label */}
         <div className="pointer-events-none absolute left-8 top-10 z-20 max-w-sm">
           <h2 className="flex items-center gap-2 font-heading text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
