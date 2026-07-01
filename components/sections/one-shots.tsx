@@ -16,16 +16,49 @@ import { useEffect, useMemo, useRef, useState } from "react";
  * live 3D — so it doesn't bend as you scroll. Left controls cycle demos.
  */
 
-type Demo = { name: string; url: string; accent: string; bg: string };
+// A demo is either a real site (screenshot `image` + `caption`) or a placeholder
+// mock (solid `bg` + `accent`) still awaiting its real screenshot.
+type Demo = { name: string; url: string; accent?: string; bg?: string; image?: string; caption?: string };
 
-// Placeholder demo sites. `bg` is a solid dark fill (testing the roll motion —
-// swap back to real screenshots later).
 const DEMOS: Demo[] = [
-  { name: "Aperture Studio", url: "#", accent: "bg-rose-500", bg: "bg-rose-900" },
+  {
+    name: "Magdalen Rozsa",
+    url: "https://www.magdalenrozsa.com/",
+    image: "/one-shots/magdalen-rozsa.jpg",
+    caption: "Artist Portfolio with Integrated CMS",
+  },
   { name: "Northwind Coffee", url: "#", accent: "bg-amber-500", bg: "bg-amber-900" },
   { name: "Halcyon Yoga", url: "#", accent: "bg-emerald-500", bg: "bg-emerald-900" },
   { name: "Monolith Type", url: "#", accent: "bg-indigo-600", bg: "bg-indigo-900" },
 ];
+
+// The poster content — a real site screenshot with a caption band, or a
+// placeholder mock. `large` sizes it for the desktop (600px REF) vs mobile poster.
+function PosterFace({ demo, large }: { demo: Demo; large?: boolean }) {
+  if (demo.image) {
+    return (
+      <div className="absolute inset-0 flex flex-col bg-white">
+        {/* biome-ignore lint/performance/noImgElement: warped poster art */}
+        <img src={demo.image} alt={demo.name} className="min-h-0 w-full flex-1 object-cover object-top" />
+        <div className={large ? "shrink-0 px-8 py-6" : "shrink-0 px-5 py-4"}>
+          <p
+            className={`text-center font-semibold leading-tight tracking-tight text-neutral-800 ${large ? "text-2xl" : "text-sm"}`}
+          >
+            {demo.caption}
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className={`absolute inset-0 flex flex-col items-center justify-center px-8 text-center ${demo.bg} ${large ? "gap-6" : "gap-5"}`}>
+      <div className={`rounded-2xl ${demo.accent} ${large ? "size-12" : "size-10"}`} />
+      <span className={`font-bold tracking-tight text-white ${large ? "text-4xl" : "text-2xl"}`}>{demo.name}</span>
+      <div className={`w-2/3 rounded-full bg-white/20 ${large ? "h-2.5" : "h-2"}`} />
+      <div className={`w-1/2 rounded-full bg-white/20 ${large ? "h-2.5" : "h-2"}`} />
+    </div>
+  );
+}
 
 // Poster-panel corners as fractions of billboard-base.png — TL, TR, BR, BL.
 // The panel is a trapezoid (recedes to the right). TODO(tune) in-browser.
@@ -173,12 +206,9 @@ export function OneShotsSection() {
                   animate="center"
                   exit="exit"
                   transition={ROLL_TRANSITION}
-                  className={`absolute inset-0 flex flex-col items-center justify-center gap-6 ${demo.bg} px-10 text-center`}
+                  className="absolute inset-0"
                 >
-                  <div className={`size-12 rounded-2xl ${demo.accent}`} />
-                  <span className="text-4xl font-bold tracking-tight text-white">{demo.name}</span>
-                  <div className="h-2.5 w-2/3 rounded-full bg-white/20" />
-                  <div className="h-2.5 w-1/2 rounded-full bg-white/20" />
+                  <PosterFace demo={demo} large />
                 </motion.div>
               </AnimatePresence>
               {/* Reflection — record-style screen-blend texture (rozsa), static
@@ -190,7 +220,7 @@ export function OneShotsSection() {
                 fill
                 sizes="30vw"
                 style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
-                className="pointer-events-none object-cover opacity-80 mix-blend-screen"
+                className="pointer-events-none object-cover opacity-40 mix-blend-screen"
               />
 
               {/* Seam: the black-ish gap between poster sheets, riding above the
@@ -307,12 +337,9 @@ export function OneShotsSection() {
               animate="center"
               exit="exit"
               transition={ROLL_TRANSITION}
-              className={`absolute inset-0 flex flex-col items-center justify-center gap-5 ${demo.bg} px-8 text-center`}
+              className="absolute inset-0"
             >
-              <div className={`size-10 rounded-2xl ${demo.accent}`} />
-              <span className="text-2xl font-bold tracking-tight text-white">{demo.name}</span>
-              <div className="h-2 w-2/3 rounded-full bg-white/20" />
-              <div className="h-2 w-1/2 rounded-full bg-white/20" />
+              <PosterFace demo={demo} />
             </motion.div>
           </AnimatePresence>
 
@@ -323,7 +350,7 @@ export function OneShotsSection() {
             fill
             sizes="80vw"
             style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
-            className="pointer-events-none object-cover opacity-80 mix-blend-screen"
+            className="pointer-events-none object-cover opacity-40 mix-blend-screen"
           />
 
           <AnimatePresence custom={direction} initial={false}>

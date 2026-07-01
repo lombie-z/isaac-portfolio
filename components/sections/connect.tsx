@@ -42,8 +42,7 @@ function Blog(props: SVGProps<SVGSVGElement>) {
 
 const SOCIALS = [
   { label: "GitHub", href: "https://github.com/isaaclombardssw", Icon: Github },
-  // TODO(isaac): replace with your real LinkedIn profile URL.
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/", Icon: Linkedin },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/isaac-lombard-dev/", Icon: Linkedin },
   { label: "Blog", href: "https://iwrl.net", Icon: Blog },
 ] as const;
 
