@@ -18,10 +18,24 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["400", "500", "600", "700"],
 });
 
+const DESCRIPTION =
+  "Hey I'm Isaac, an engineer, specialising in UX and Design. I help manage the creative teams at SSW – I would love to help out with whatever you're building.";
+
 export const metadata: Metadata = {
-  title: "Isaac W. R. Lombard — Technical & creative consultant",
-  description:
-    "Isaac W. R. Lombard — technical and creative consultant. Software, design, one-shot websites, and music.",
+  metadataBase: new URL("https://isaac-portfolio-rouge.vercel.app"),
+  title: "Isaac W. R. Lombard | Software and AI Consulting",
+  description: DESCRIPTION,
+  openGraph: {
+    title: "Isaac W. R. Lombard | Software and AI Consulting",
+    description: DESCRIPTION,
+    type: "website",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Isaac W. R. Lombard | Software and AI Consulting",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

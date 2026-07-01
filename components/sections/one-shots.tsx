@@ -111,14 +111,14 @@ export function OneShotsSection() {
   const paginate = (dir: 1 | -1) => setPage(([i]) => [(i + dir + DEMOS.length) % DEMOS.length, dir]);
 
   return (
-    <section ref={sectionRef} className="relative bg-background text-foreground md:h-[220vh]">
+    <section ref={sectionRef} className="relative bg-background text-foreground md:my-[10vh] md:h-[220vh]">
       {/* Nav target: top on mobile, but deep into the pin on desktop so the link
           lands with the billboard already revealing rather than at the empty start. */}
       <span id="one-shots" aria-hidden className="pointer-events-none absolute inset-x-0 top-0 md:top-[80vh]" />
       {/* Desktop: pinned billboard with rolling-window reveal + matrix3d poster */}
-      <div className="hidden h-screen items-center justify-center overflow-hidden px-6 py-6 md:sticky md:top-0 md:flex md:flex-col">
-        <div className="flex w-fit max-w-full flex-col gap-3">
-          {/* Title — sits just above the billboard */}
+      <div className="hidden h-screen flex-col justify-start overflow-hidden pt-6 md:sticky md:top-0 md:flex">
+        {/* Title — sits just above the billboard */}
+        <div className="mx-auto w-full max-w-[1700px] shrink-0 px-6 pb-3">
           <h2 className="flex items-center gap-2 font-heading text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
             One-Shot Websites
             <span className="group relative inline-flex">
@@ -137,15 +137,16 @@ export function OneShotsSection() {
               </span>
             </span>
           </h2>
+        </div>
 
-          {/* Billboard stage — frosted edges + controls sit relative to this */}
-          <div className="relative">
-            {/* Pinned billboard, revealed bottom-up */}
-            <motion.div
-              ref={sceneRef}
-              style={{ clipPath, WebkitClipPath: clipPath, height: "84vh", width: "calc(84vh * 1.5983)" }}
-              className="relative"
-            >
+        {/* Billboard stage — full width (flush); frosted edges + controls relative to it */}
+        <div className="relative mx-auto w-full max-w-[1700px] shrink-0">
+          {/* Pinned billboard, revealed bottom-up */}
+          <motion.div
+            ref={sceneRef}
+            style={{ clipPath, WebkitClipPath: clipPath }}
+            className="relative aspect-[2447/1531] w-full"
+          >
           <Image
             src="/billboard/billboard-base.png"
             alt="Bus-stop billboard advertising one-shot websites"
@@ -270,7 +271,6 @@ export function OneShotsSection() {
             </button>
           </div>
         </div>
-          </div>
         </div>
       </div>
 
