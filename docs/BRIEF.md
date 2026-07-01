@@ -16,18 +16,19 @@ Single-page scroll portfolio for Isaac W. R. Lombard (technical & creative consu
 1. **Hero** — `components/sections/hero.tsx`
    - Component: https://21st.dev/@danielpetho/components/text-cursor-proximity
    - "Isaac W. R. Lombard" as the cursor-proximity headline. Top-right: "Technical and creative consultant".
-   - Generous white padding framing a brand-violet panel. Its display font becomes the site display font.
-   - Bottom nav icons (one per `NAV_SECTIONS`); on hover a white pill slides up from the padding, label in brand violet (text === background colour).
+   - White site background; a brand-violet hero **card centred on screen** (the white margin around it is the "generous white padding"). The component's display font becomes the site display font.
+   - Nav icons row at the bottom of the card (one per `NAV_SECTIONS`). On hover, a single **white pill slides in from OUTSIDE the card** and settles just above the hovered icon; the label fades in **only once settled**, coloured the same as the card background (brand violet). White pill === site background.
 
 2. **Contact / lead capture** — `components/sections/contact.tsx`
    - Component: https://21st.dev/@kokonutd/components/animated-ai-input
    - Riff on an AI chat input. Placeholder: "What can I build for you?". Centred in viewport.
-   - Model selector with persona options ("marketing-isaac-mini", "design-consultant-4-pro", …), people icons instead of provider logos.
+   - Model selector with persona "models", each a person icon doing a **fun action** (playful lucide icons, not provider logos). Final set (each roughly maps to a service): `marketing-isaac-mini` · `design-consultant-4-pro` · `full-stack-isaac-o` · `brand-strategy-3.5` · `scrum-master-turbo`.
    - Submit → `POST /api/contact { message }`. If the message has no email (`lib/email.ts` `containsEmail`), reveal an optional "add an email?" field that POSTs `{ message, replyEmail }`. No upfront contact fields.
 
 3. **Dev showcase** — `components/sections/showcase.tsx`
    - Component: https://21st.dev/@prebuiltui/components/cards/marquee-cards-with-hover-effect
-   - Hero-styled cards, mix of services + projects, mix of image and info cards. Content from round-2 grilling.
+   - Hero-styled cards, mix of services + projects, mix of image and info cards.
+   - Services (refine later): TinaCMS (UI, UX & development) · custom business solutions · graphic design · Scrum Master / Product Owner for creative teams. Projects TBD.
 
 4. **One-shots (custom, the doozy)** — `components/sections/one-shots.tsx`
    - Assets: `/public/billboard/billboard-base.png` (billboard photo), `/public/billboard/billboard-glass.png` (reflection cutout to blend on top).
@@ -39,12 +40,14 @@ Single-page scroll portfolio for Isaac W. R. Lombard (technical & creative consu
 
 5. **Music** — `components/sections/music.tsx`
    - Component: https://21st.dev/community/components/makviesainte/team-showcase/default
-   - Cards for isaacrozsa.com + `/good-talk` + `/arrhythmia` (each with its own favicon colour from the rozsa project), the two singles, one Spotify card, one Tidal card, rest "coming soon".
+   - Everything is folded into the **`ROZSA/rozsa`** app (isaacrozsa.com). Routes: `/` (home), `/good-talk` (formerly the `flowers` project), `/arrhythmia` (corrected spelling). The two singles also live on isaacrozsa.com.
+   - Each route has its own accent colour/favicon — source from `ROZSA/rozsa` (fall back to `ROZSA/flowers` and `ROZSA/arrythmia` for colours/favicons). Copy favicons into `public/music/` and tint each card to match.
+   - Cards: home, good-talk, arrhythmia, the two singles, a Spotify card, a Tidal card, rest "coming soon". Spotify/Tidal URLs + single names: mine from the rozsa repo if present, else placeholder for Isaac to fill.
    - Footer line: "I love AI but don't feel the need to use it for my music — this is all me and a few synths."
 
 6. **Socials / end** — `components/sections/connect.tsx`
    - Component: https://21st.dev/@aliimam/components/cosmos-spectrum
-   - Social icons white against the brand colour, glowing on hover. Links from round-2 grilling.
+   - Social icons white against the brand colour, glowing on hover. Links: GitHub (github.com/isaaclombardssw) + LinkedIn (URL TBD — placeholder). Just these two.
 
 ## Pulling 21st.dev components
 
