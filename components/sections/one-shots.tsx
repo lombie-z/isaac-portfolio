@@ -194,42 +194,19 @@ export function OneShotsSection() {
 
         {/* Glassy frosted fade on the left and right edges of the billboard */}
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[22%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[14%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
           style={{
             maskImage: "linear-gradient(to right, black, transparent)",
             WebkitMaskImage: "linear-gradient(to right, black, transparent)",
           }}
         />
         <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[22%] bg-gradient-to-l from-white/25 to-transparent backdrop-blur-md"
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[14%] bg-gradient-to-l from-white/25 to-transparent backdrop-blur-md"
           style={{
             maskImage: "linear-gradient(to left, black, transparent)",
             WebkitMaskImage: "linear-gradient(to left, black, transparent)",
           }}
         />
-
-        {/* A crisp copy of the billboard, layered above the frost but revealed
-            only through the controls oval — a clean window into the sharp image
-            rather than a hole masked out of the blur. Same box + object-cover as
-            the base image, so it lines up pixel-for-pixel. */}
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden">
-          <div className="relative aspect-[2447/1531] w-full max-w-[1700px]">
-            <Image
-              src="/billboard/billboard-base.png"
-              alt=""
-              aria-hidden
-              fill
-              sizes="100vw"
-              className="object-cover"
-              style={{
-                maskImage: "radial-gradient(64px 128px at 76px 50%, black 70%, transparent 82%)",
-                WebkitMaskImage: "radial-gradient(64px 128px at 76px 50%, black 70%, transparent 82%)",
-                maskRepeat: "no-repeat",
-                WebkitMaskRepeat: "no-repeat",
-              }}
-            />
-          </div>
-        </div>
 
         {/* Section label */}
         <div className="pointer-events-none absolute left-8 top-10 z-20 max-w-sm">
@@ -255,7 +232,7 @@ export function OneShotsSection() {
 
         {/* Left controls */}
         <div className="absolute left-8 top-1/2 z-20 -translate-y-1/2">
-          <div className="flex flex-col items-center gap-3 p-3">
+          <div className="flex flex-col items-center gap-3 rounded-full border border-black/10 bg-white/70 p-3 shadow-lg backdrop-blur-md">
             <button
               type="button"
               onClick={() => paginate(-1)}
