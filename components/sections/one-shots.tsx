@@ -60,6 +60,35 @@ function PosterFace({ demo, large }: { demo: Demo; large?: boolean }) {
   );
 }
 
+// Glass reflection over the poster: multiply carries the reflected structure
+// (deviation from white, so the screenshot keeps its true colours) and a light
+// screen adds just the bright sheen that reads as glass.
+function PosterReflection() {
+  const style = { transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" } as const;
+  return (
+    <>
+      <Image
+        src="/billboard/billboard-reflection.png"
+        alt=""
+        aria-hidden
+        fill
+        sizes="40vw"
+        style={style}
+        className="pointer-events-none object-cover mix-blend-multiply"
+      />
+      <Image
+        src="/billboard/billboard-reflection.png"
+        alt=""
+        aria-hidden
+        fill
+        sizes="40vw"
+        style={style}
+        className="pointer-events-none object-cover opacity-25 mix-blend-screen"
+      />
+    </>
+  );
+}
+
 // Poster-panel corners as fractions of billboard-base.png — TL, TR, BR, BL.
 // The panel is a trapezoid (recedes to the right). TODO(tune) in-browser.
 const CORNERS: [number, number][] = [
@@ -211,17 +240,8 @@ export function OneShotsSection() {
                   <PosterFace demo={demo} large />
                 </motion.div>
               </AnimatePresence>
-              {/* Reflection — record-style screen-blend texture (rozsa), static
-                  over the glass while the poster rolls beneath it. */}
-              <Image
-                src="/billboard/billboard-reflection.png"
-                alt=""
-                aria-hidden
-                fill
-                sizes="30vw"
-                style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
-                className="pointer-events-none object-cover opacity-100 mix-blend-multiply"
-              />
+              {/* Reflection — static glass over the rolling poster. */}
+              <PosterReflection />
 
               {/* Seam: the black-ish gap between poster sheets, riding above the
                   glass (so screen-blend can't wash it out) and tracking the top
@@ -343,15 +363,7 @@ export function OneShotsSection() {
             </motion.div>
           </AnimatePresence>
 
-          <Image
-            src="/billboard/billboard-reflection.png"
-            alt=""
-            aria-hidden
-            fill
-            sizes="80vw"
-            style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
-            className="pointer-events-none object-cover opacity-100 mix-blend-multiply"
-          />
+          <PosterReflection />
 
           <AnimatePresence custom={direction} initial={false}>
             <motion.div
