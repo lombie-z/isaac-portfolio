@@ -3,16 +3,17 @@
 import { ChevronDown, ChevronUp, Eye } from "lucide-react";
 import { motion, useMotionTemplate, useScroll, useTransform } from "motion/react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * SECTION 4 — ONE-SHOTS (rolling-window billboard)
  *
  * The billboard photo sits pinned behind the white background; as you scroll,
- * the "window" rolls up and reveals it from the bottom (clip-path inset) — as if
- * the image had always been sitting there. The demo site sits statically inside
- * the billboard's poster panel, with the clipped reflection texture blended over
- * it (record-style screen blend, per the rozsa repo). Left controls cycle demos.
+ * the window rolls up and reveals it from the bottom (clip-path inset). The demo
+ * site is perspective-mapped (matrix3d homography) onto the billboard's angled
+ * poster panel so it lines up exactly, with the clipped reflection texture
+ * blended over it (record-style screen blend, per the rozsa repo). Static — no
+ * live 3D — so it doesn't bend as you scroll. Left controls cycle demos.
  */
 
 type Demo = { name: string; url: string; className: string };
@@ -25,22 +26,66 @@ const DEMOS: Demo[] = [
   { name: "Monolith Type", url: "#", className: "from-zinc-200 via-zinc-400 to-zinc-700" },
 ];
 
-// Poster-panel geometry over billboard-base.png (2447×1531): fits the demo +
-// reflection onto the billboard's blank panel. Static. TODO(tune) in-browser.
-const POSTER = {
-  left: 44.2,
-  top: 25,
-  width: 24,
-  height: 60,
-  rotateY: -12.5,
-  rotateZ: 0.4,
-  perspective: 1400,
-};
+// Poster-panel corners as fractions of billboard-base.png — TL, TR, BR, BL.
+// The panel is a trapezoid (recedes to the right). TODO(tune) in-browser.
+const CORNERS: [number, number][] = [
+  [0.447, 0.331], // top-left
+  [0.672, 0.349], // top-right
+  [0.674, 0.858], // bottom-right
+  [0.447, 0.900], // bottom-left
+];
+
+// Reference (frontal) size the demo/reflection fill before being warped. Aspect
+// matches the reflection image (536×885).
+const REF_W = 600;
+const REF_H = 990;
+
+// Homography mapping the REF_W×REF_H rectangle onto the four dst corners (px).
+function quadMatrix3d(dst: [number, number][]): string {
+  const [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = dst; // TL, TR, BR, BL
+  const dx1 = x1 - x2;
+  const dx2 = x3 - x2;
+  const dx3 = x0 - x1 + x2 - x3;
+  const dy1 = y1 - y2;
+  const dy2 = y3 - y2;
+  const dy3 = y0 - y1 + y2 - y3;
+  let a: number, b: number, c: number, d: number, e: number, f: number, g: number, i: number;
+  if (Math.abs(dx3) < 1e-6 && Math.abs(dy3) < 1e-6) {
+    a = x1 - x0; b = x2 - x1; c = x0; d = y1 - y0; e = y2 - y1; f = y0; g = 0; i = 0;
+  } else {
+    const den = dx1 * dy2 - dx2 * dy1;
+    g = (dx3 * dy2 - dx2 * dy3) / den;
+    i = (dx1 * dy3 - dx3 * dy1) / den;
+    a = x1 - x0 + g * x1; b = x3 - x0 + i * x3; c = x0;
+    d = y1 - y0 + g * y1; e = y3 - y0 + i * y3; f = y0;
+  }
+  // Scale the source rectangle (REF_W×REF_H) into the unit square used above.
+  const m = [a / REF_W, d / REF_W, 0, g / REF_W, b / REF_H, e / REF_H, 0, i / REF_H, 0, 0, 1, 0, c, f, 0, 1];
+  return `matrix3d(${m.map((n) => n.toFixed(6)).join(",")})`;
+}
 
 export function OneShotsSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
   const [index, setIndex] = useState(0);
   const demo = DEMOS[index];
+
+  // Measure the billboard so the homography maps to real pixels (and on resize).
+  useEffect(() => {
+    const el = sceneRef.current;
+    if (!el) return;
+    const update = () => setSize({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const matrix = useMemo(() => {
+    if (!size.w || !size.h) return undefined;
+    return quadMatrix3d(CORNERS.map(([fx, fy]) => [fx * size.w, fy * size.h]));
+  }, [size]);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
   // Rolling window: reveal the pinned image from the bottom up.
@@ -54,6 +99,7 @@ export function OneShotsSection() {
       <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
         {/* Pinned billboard, revealed bottom-up */}
         <motion.div
+          ref={sceneRef}
           style={{ clipPath, WebkitClipPath: clipPath }}
           className="relative aspect-[2447/1531] w-full max-w-[1700px]"
         >
@@ -66,26 +112,14 @@ export function OneShotsSection() {
             className="object-cover"
           />
 
-          {/* Poster panel: static demo + clipped reflection */}
-          <div
-            className="absolute"
-            style={{
-              left: `${POSTER.left}%`,
-              top: `${POSTER.top}%`,
-              width: `${POSTER.width}%`,
-              height: `${POSTER.height}%`,
-              perspective: `${POSTER.perspective}px`,
-            }}
-          >
+          {/* Demo + reflection, perspective-mapped onto the poster panel */}
+          {matrix && (
             <div
-              className="relative h-full w-full overflow-hidden"
-              style={{
-                transform: `rotateY(${POSTER.rotateY}deg) rotateZ(${POSTER.rotateZ}deg)`,
-                transformOrigin: "left center",
-              }}
+              className="absolute left-0 top-0 overflow-hidden"
+              style={{ width: REF_W, height: REF_H, transform: matrix, transformOrigin: "0 0" }}
             >
               <div className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br ${demo.className}`}>
-                <span className="text-lg font-semibold text-white/90 drop-shadow">{demo.name}</span>
+                <span className="text-4xl font-semibold text-white/90 drop-shadow">{demo.name}</span>
               </div>
               {/* Reflection — record-style screen-blend texture (rozsa) */}
               <Image
@@ -97,7 +131,7 @@ export function OneShotsSection() {
                 className="pointer-events-none object-cover opacity-80 mix-blend-screen"
               />
             </div>
-          </div>
+          )}
         </motion.div>
 
         {/* Section label */}
