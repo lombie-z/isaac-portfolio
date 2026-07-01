@@ -29,10 +29,10 @@ const DEMOS: Demo[] = [
 // Poster-panel corners as fractions of billboard-base.png — TL, TR, BR, BL.
 // The panel is a trapezoid (recedes to the right). TODO(tune) in-browser.
 const CORNERS: [number, number][] = [
-  [0.447, 0.316], // top-left
-  [0.679, 0.341], // top-right
-  [0.681, 0.853], // bottom-right
-  [0.447, 0.894], // bottom-left
+  [0.447, 0.318], // top-left
+  [0.679, 0.334], // top-right
+  [0.681, 0.862], // bottom-right
+  [0.447, 0.892], // bottom-left
 ];
 
 // Reference (frontal) size the demo/reflection fill before being warped. Aspect
