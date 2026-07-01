@@ -2,7 +2,6 @@
 
 import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 
 export type MarqueeCard = {
   title: string;
@@ -61,17 +60,12 @@ export function MarqueeCards({ cards, durationMs }: { cards: MarqueeCard[]; dura
 function Card({ card }: { card: MarqueeCard }) {
   const Icon = card.icon;
   return (
-    <div className="group relative mx-4 h-[20rem] w-56 overflow-hidden rounded-xl transition-all duration-300 hover:scale-90">
+    <div className="group relative mx-4 h-[20rem] w-56 overflow-hidden transition-all duration-300 hover:scale-90">
       {card.image ? (
         // biome-ignore lint/performance/noImgElement: marquee card art, swapped by Isaac
         <img src={card.image} alt="" className="h-full w-full object-cover" />
       ) : (
-        <div
-          className={cn(
-            "flex h-full w-full items-center justify-center bg-gradient-to-br",
-            card.gradient ?? "from-brand-muted via-brand to-brand-deep"
-          )}
-        >
+        <div className="flex h-full w-full items-center justify-center bg-brand">
           {Icon && <Icon className="size-10 text-brand-foreground/80" />}
         </div>
       )}
