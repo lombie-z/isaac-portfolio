@@ -163,6 +163,7 @@ export function OneShotsSection() {
                 aria-hidden
                 fill
                 sizes="30vw"
+                style={{ transform: "translateY(1.5%) scale(1.08)", transformOrigin: "left center" }}
                 className="pointer-events-none object-cover opacity-80 mix-blend-screen"
               />
             </div>
