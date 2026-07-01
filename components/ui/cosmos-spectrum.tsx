@@ -49,7 +49,13 @@ export function CosmicSpectrum({
   const colors = THEMES[color];
 
   return (
-    <div ref={ref} className="pointer-events-none absolute -inset-x-[6%] -bottom-[4%] h-[94%]">
+    <div
+      ref={ref}
+      className="pointer-events-none absolute -inset-x-[6%] -bottom-[4%] h-[94%]"
+      // CSS blur (not an SVG filter) so it rasterises as one stable GPU layer —
+      // SVG filters band under the partial repaints triggered by icon hovers.
+      style={{ filter: blur ? "blur(16px)" : undefined }}
+    >
       <motion.svg
         style={{ scaleY, transformOrigin: "bottom" }}
         className="h-full w-full"
@@ -58,23 +64,12 @@ export function CosmicSpectrum({
         fill="none"
         aria-hidden
       >
-        <g clipPath="url(#spectrum-clip)" filter={blur ? "url(#spectrum-blur)" : undefined}>
+        <g clipPath="url(#spectrum-clip)">
           {PATHS.map((d, i) => (
             <path key={i} d={d} fill={`url(#spectrum-grad${i})`} />
           ))}
         </g>
         <defs>
-          <filter
-            id="spectrum-blur"
-            x="-30"
-            y="-30"
-            width="1627"
-            height="644"
-            filterUnits="userSpaceOnUse"
-            colorInterpolationFilters="sRGB"
-          >
-            <feGaussianBlur stdDeviation="15" />
-          </filter>
           {Array.from({ length: 9 }, (_, i) => (
             <linearGradient
               key={i}
