@@ -54,7 +54,10 @@ export function CosmicSpectrum({
       className="pointer-events-none absolute -inset-x-[6%] -bottom-[4%] h-[94%]"
       // CSS blur (not an SVG filter) so it rasterises as one stable GPU layer —
       // SVG filters band under the partial repaints triggered by icon hovers.
-      style={{ filter: blur ? "blur(16px)" : undefined }}
+      // `willChange: transform` keeps the blurred output cached as its own
+      // compositor layer, so sibling repaints (icon hover) recomposite it rather
+      // than re-rasterising the blur and leaving a seam.
+      style={{ filter: blur ? "blur(16px)" : undefined, willChange: "transform" }}
     >
       <motion.svg
         style={{ scaleY, transformOrigin: "bottom" }}

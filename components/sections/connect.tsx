@@ -71,7 +71,11 @@ export function ConnectSection() {
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={label}
-                  className="grid size-16 place-items-center rounded-full text-background transition-transform duration-300 ease-out hover:scale-110 focus-visible:scale-110 focus-visible:outline-none md:size-20"
+                  // transform-gpu + will-change-transform keep each icon on its own
+                  // compositor layer, so the hover scale is a pure GPU transform and
+                  // never forces the blurred spectrum backdrop to re-rasterise (which
+                  // left a white seam under the icons).
+                  className="grid size-16 transform-gpu place-items-center rounded-full text-background transition-transform duration-300 ease-out will-change-transform hover:scale-110 focus-visible:scale-110 focus-visible:outline-none md:size-20"
                 >
                   <Icon className="size-8 text-background md:size-9" />
                 </a>
