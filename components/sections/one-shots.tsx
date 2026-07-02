@@ -296,8 +296,9 @@ export function OneShotsSection() {
           }}
         />
 
-        {/* Left controls */}
-        <div className="absolute left-8 top-1/2 z-20 -translate-y-1/2">
+        {/* Left controls — revealed with the rolling window (not before it) so
+            they never float over the blank frame. */}
+        <motion.div className="absolute left-8 top-1/2 z-20 -translate-y-1/2" style={{ clipPath, WebkitClipPath: clipPath }}>
           <div className="flex flex-col items-center gap-3 rounded-full border border-black/10 bg-white/70 p-3 shadow-lg backdrop-blur-md">
             <button
               type="button"
@@ -330,7 +331,7 @@ export function OneShotsSection() {
               <ChevronDown className="size-5" />
             </button>
           </div>
-        </div>
+        </motion.div>
         </div>
       </div>
 
