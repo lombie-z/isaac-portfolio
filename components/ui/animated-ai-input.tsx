@@ -222,7 +222,7 @@ export function LeadCaptureChat() {
                                 type="button"
                                 className={cn(
                                     "group/send rounded-lg p-2 transition",
-                                    value.trim() ? "bg-brand text-brand-foreground hover:brightness-110" : "bg-black/5"
+                                    value.trim() ? "bg-brand text-brand-foreground hover:brightness-90" : "bg-black/5"
                                 )}
                                 aria-label="Send message"
                                 disabled={!value.trim() || status === "sending"}
