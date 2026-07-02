@@ -56,7 +56,7 @@ export function ConnectSection() {
           risen finale rather than the empty top of the pinned section. */}
       <span id="connect" aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0" />
       <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden p-8">
-        <CosmicSpectrum color="blue" blur progress={scrollYProgress} />
+        <CosmicSpectrum progress={scrollYProgress} />
 
         <div className="relative z-10 flex flex-col items-center gap-10 text-center">
           <h2 className="font-heading text-4xl font-semibold tracking-tight text-background md:text-6xl">
@@ -71,11 +71,7 @@ export function ConnectSection() {
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={label}
-                  // transform-gpu + will-change-transform keep each icon on its own
-                  // compositor layer, so the hover scale is a pure GPU transform and
-                  // never forces the blurred spectrum backdrop to re-rasterise (which
-                  // left a white seam under the icons).
-                  className="grid size-16 transform-gpu place-items-center rounded-full text-background transition-transform duration-300 ease-out will-change-transform hover:scale-110 focus-visible:scale-110 focus-visible:outline-none md:size-20"
+                  className="grid size-16 place-items-center rounded-full text-background transition-transform duration-300 ease-out hover:scale-110 focus-visible:scale-110 focus-visible:outline-none md:size-20"
                 >
                   <Icon className="size-8 text-background md:size-9" />
                 </a>
