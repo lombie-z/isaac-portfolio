@@ -179,11 +179,6 @@ export function OneShotsSection() {
   // Rolling window: reveal the pinned image from the bottom up.
   const clipTop = useTransform(scrollYProgress, [0.05, 0.95], ["100%", "0%"]);
   const clipPath = useMotionTemplate`inset(${clipTop} 0% 0% 0%)`;
-  // The controls sit at the billboard's vertical centre, so wipe them in over the
-  // scroll window where the reveal edge crosses that band — they read as revealed
-  // by the same edge rather than running their own clip over the whole scroll.
-  const controlsClipTop = useTransform(scrollYProgress, [0.4, 0.6], ["100%", "0%"]);
-  const controlsClip = useMotionTemplate`inset(${controlsClipTop} 0% 0% 0%)`;
 
   const paginate = (dir: 1 | -1) => setPage(([i]) => [(i + dir + DEMOS.length) % DEMOS.length, dir]);
 
@@ -283,58 +278,57 @@ export function OneShotsSection() {
               </AnimatePresence>
             </div>
           )}
-        </motion.div>
 
-        {/* Glassy frosted fade on the left and right edges of the billboard */}
-        <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[14%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
-          style={{
-            maskImage: "linear-gradient(to right, black, transparent)",
-            WebkitMaskImage: "linear-gradient(to right, black, transparent)",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[14%] bg-gradient-to-l from-white/25 to-transparent backdrop-blur-md"
-          style={{
-            maskImage: "linear-gradient(to left, black, transparent)",
-            WebkitMaskImage: "linear-gradient(to left, black, transparent)",
-          }}
-        />
+          {/* Frosted edges + controls live INSIDE the clipped billboard, so the
+              rolling window reveals them with the very same edge (no separate
+              clip, nothing to keep in sync). */}
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[14%] bg-gradient-to-r from-white/25 to-transparent backdrop-blur-md"
+            style={{
+              maskImage: "linear-gradient(to right, black, transparent)",
+              WebkitMaskImage: "linear-gradient(to right, black, transparent)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[14%] bg-gradient-to-l from-white/25 to-transparent backdrop-blur-md"
+            style={{
+              maskImage: "linear-gradient(to left, black, transparent)",
+              WebkitMaskImage: "linear-gradient(to left, black, transparent)",
+            }}
+          />
+          <div className="absolute left-8 top-1/2 z-20 -translate-y-1/2">
+            <div className="flex flex-col items-center gap-3 rounded-full border border-black/10 bg-white/70 p-3 shadow-lg backdrop-blur-md">
+              <button
+                type="button"
+                onClick={() => paginate(-1)}
+                aria-label="Previous site"
+                className="grid size-11 place-items-center rounded-full text-foreground/70 transition hover:bg-black/5 hover:text-foreground"
+              >
+                <ChevronUp className="size-5" />
+              </button>
 
-        {/* Left controls — revealed with the rolling window (not before it) so
-            they never float over the blank frame. */}
-        <motion.div className="absolute left-8 top-1/2 z-20 -translate-y-1/2" style={{ clipPath: controlsClip, WebkitClipPath: controlsClip }}>
-          <div className="flex flex-col items-center gap-3 rounded-full border border-black/10 bg-white/70 p-3 shadow-lg backdrop-blur-md">
-            <button
-              type="button"
-              onClick={() => paginate(-1)}
-              aria-label="Previous site"
-              className="grid size-11 place-items-center rounded-full text-foreground/70 transition hover:bg-black/5 hover:text-foreground"
-            >
-              <ChevronUp className="size-5" />
-            </button>
+              <a
+                href={demo.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={`Open ${demo.name}`}
+                className="grid size-16 place-items-center rounded-full bg-brand text-brand-foreground shadow-lg shadow-brand/30 transition hover:brightness-110"
+              >
+                <span className="flex flex-col items-center leading-none">
+                  <ExternalLink className="size-5" />
+                  <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide">open</span>
+                </span>
+              </a>
 
-            <a
-              href={demo.url}
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label={`Open ${demo.name}`}
-              className="grid size-16 place-items-center rounded-full bg-brand text-brand-foreground shadow-lg shadow-brand/30 transition hover:brightness-110"
-            >
-              <span className="flex flex-col items-center leading-none">
-                <ExternalLink className="size-5" />
-                <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide">open</span>
-              </span>
-            </a>
-
-            <button
-              type="button"
-              onClick={() => paginate(1)}
-              aria-label="Next site"
-              className="grid size-11 place-items-center rounded-full text-foreground/70 transition hover:bg-black/5 hover:text-foreground"
-            >
-              <ChevronDown className="size-5" />
-            </button>
+              <button
+                type="button"
+                onClick={() => paginate(1)}
+                aria-label="Next site"
+                className="grid size-11 place-items-center rounded-full text-foreground/70 transition hover:bg-black/5 hover:text-foreground"
+              >
+                <ChevronDown className="size-5" />
+              </button>
+            </div>
           </div>
         </motion.div>
         </div>
