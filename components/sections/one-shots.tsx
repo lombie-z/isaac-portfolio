@@ -56,7 +56,6 @@ const FAQ_ITEMS = [
     description: (
       <div className="space-y-2.5">
         <p>A website built with AI in a single prompt, or in my personal verbiage: under ~10.</p>
-        <p>Layout, copy and styling all at once.</p>
         <p>These can get really ambitious; the craft is in making them not look one-shot.</p>
       </div>
     ),
@@ -67,11 +66,9 @@ const FAQ_ITEMS = [
     icon: <Workflow className="h-4 w-4" />,
     description: (
       <div className="space-y-2.5">
+        <p>AI is the fast first draft, not the final answer.</p>
         <p>
-          AI is the fast first draft, not the final answer. Everything gets a design-system pass, real UX thinking, and hand-tuned craft on top — so it holds up like it was built deliberately, not generated.
-        </p>
-        <p>
-          This happens via skills, curated context and custom applications that makes use of my development skills alongside AI velocity to complete projects fast and to a high quality.
+          This happens via skills, curated context, UX testing and custom applications that makes use of my development skills alongside AI velocity to complete projects fast and to a high quality.
         </p>
       </div>
     ),
@@ -84,7 +81,9 @@ const FAQ_ITEMS = [
       <div className="space-y-2.5">
         <p>2 human elements here: taste and an attention to detail.</p>
         <p>
-          You can't make something beautiful without these, but you can get closer with a few key tools (curated over ad hoc components, design systems, skills), I've got a blog post about how I like to use them.{" "}
+          You can't make something beautiful without these, but you can get closer with a few key tools (curated over ad hoc components, design systems, skills), I've got a blog post about how I like to use them.
+        </p>
+        <p>
           <a
             href="https://iwrl.net"
             target="_blank"
@@ -104,8 +103,8 @@ const FAQ_ITEMS = [
     description: (
       <div className="space-y-2.5">
         <p>Most one-shot-style sites land in a day; depending on integrations, complexity and further refinement longer timelines up to a week.</p>
+        <p>Timelines for data-driven applications are longer.</p>
         <p>
-          Timelines for data-driven applications are longer.{" "}
           <a href="#contact" className="font-medium text-brand underline-offset-2 hover:underline">
             Start a chat →
           </a>
