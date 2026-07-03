@@ -288,7 +288,6 @@ export function OneShotsSection() {
             <div className="w-full max-w-xl">
               <BouncyAccordion
                 items={FAQ_ITEMS}
-                defaultValue="what"
                 classNames={{ item: "bg-black/[0.04]", trigger: "hover:bg-black/[0.02]" }}
               />
             </div>
