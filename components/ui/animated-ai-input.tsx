@@ -83,10 +83,11 @@ export function LeadCaptureChat() {
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({ minHeight: 72, maxHeight: 300 });
     const [selectedModel, setSelectedModel] = useState("full-stack-isaac-o");
     const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-    const [showEmail, setShowEmail] = useState(false);
+    // When a message carries no email, expand an inline email field within the box
+    // and capture it on the next tap — rather than firing then asking after.
+    const [needEmail, setNeedEmail] = useState(false);
     const [replyEmail, setReplyEmail] = useState("");
-    const [emailSent, setEmailSent] = useState(false);
-    const lastMessage = useRef("");
+    const emailRef = useRef<HTMLInputElement>(null);
 
     const post = (body: Record<string, string>) =>
         fetch("/api/contact", {
@@ -95,39 +96,40 @@ export function LeadCaptureChat() {
             body: JSON.stringify(body),
         });
 
-    const send = async () => {
+    // Focus the email field the moment it expands.
+    useEffect(() => {
+        if (needEmail) emailRef.current?.focus();
+    }, [needEmail]);
+
+    const handleSubmit = async () => {
         const message = value.trim();
         if (!message || status === "sending") return;
+        // First tap on a message with no email: reveal the inline email field instead of sending.
+        if (!needEmail && !containsEmail(message)) {
+            setNeedEmail(true);
+            return;
+        }
         setStatus("sending");
         try {
-            const res = await post({ message: `[${selectedModel}] ${message}` });
+            const body: Record<string, string> = { message: `[${selectedModel}] ${message}` };
+            const email = replyEmail.trim();
+            if (email) body.replyEmail = email;
+            const res = await post(body);
             if (!res.ok) throw new Error();
-            lastMessage.current = message;
             setValue("");
+            setReplyEmail("");
+            setNeedEmail(false);
             adjustHeight(true);
             setStatus("sent");
-            if (!containsEmail(message)) setShowEmail(true);
         } catch {
             setStatus("error");
-        }
-    };
-
-    const sendEmail = async () => {
-        const email = replyEmail.trim();
-        if (!email) return;
-        try {
-            await post({ message: `[${selectedModel}] ${lastMessage.current}`, replyEmail: email });
-            setEmailSent(true);
-            setShowEmail(false);
-        } catch {
-            /* keep the field open on failure */
         }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey && value.trim()) {
             e.preventDefault();
-            send();
+            handleSubmit();
         }
     };
 
@@ -152,6 +154,35 @@ export function LeadCaptureChat() {
                             }}
                         />
                     </div>
+
+                    {/* Inline email field — expands within the box border on the first tap
+                        when the message carried no email, pushing the controls down. */}
+                    <AnimatePresence initial={false}>
+                        {needEmail && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.25, ease: "easeOut" }}
+                                className="overflow-hidden"
+                            >
+                                <input
+                                    ref={emailRef}
+                                    type="email"
+                                    value={replyEmail}
+                                    onChange={(e) => setReplyEmail(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleSubmit();
+                                        }
+                                    }}
+                                    placeholder="Your email, so I can reply"
+                                    className="w-full border-t border-black/10 bg-black/5 px-4 py-3 text-foreground placeholder:text-black/50 focus:outline-none"
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     <div className="flex h-14 items-center rounded-b-xl bg-black/5">
                         <div className="absolute bottom-3 left-3 right-3 flex w-[calc(100%-24px)] items-center justify-between">
@@ -224,14 +255,17 @@ export function LeadCaptureChat() {
                                     "group/send rounded-lg p-2 transition",
                                     value.trim() ? "bg-brand text-brand-foreground hover:brightness-90" : "bg-black/5"
                                 )}
-                                aria-label="Send message"
+                                aria-label={needEmail ? "Add your email and send" : "Send message"}
                                 disabled={!value.trim() || status === "sending"}
-                                onClick={send}
+                                onClick={handleSubmit}
                             >
                                 {status === "sending" ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : needEmail ? (
+                                    // Email step: the arrow has become the mail icon.
+                                    <Mail className="h-4 w-4" />
                                 ) : (
-                                    // Arrow slides up and out on hover, revealing the email icon.
+                                    // Compose: arrow slides up on hover to preview the email step.
                                     <span
                                         className={cn(
                                             "relative block h-4 w-4 overflow-hidden transition-opacity duration-200",
@@ -248,43 +282,17 @@ export function LeadCaptureChat() {
                 </div>
             </div>
 
-            {/* Status + optional email follow-up */}
+            {/* Status */}
             <AnimatePresence>
                 {status === "sent" && (
-                    <motion.div
+                    <motion.p
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         className="mt-3 px-1 text-sm text-foreground/70"
                     >
-                        {emailSent ? (
-                            "Got it — I'll be in touch."
-                        ) : showEmail ? (
-                            <div className="flex flex-col gap-2">
-                                <span>Sent. Want to add an email so I can reply?</span>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="email"
-                                        value={replyEmail}
-                                        onChange={(e) => setReplyEmail(e.target.value)}
-                                        onKeyDown={(e) => e.key === "Enter" && sendEmail()}
-                                        placeholder="you@email.com"
-                                        className="flex-1 rounded-lg border border-black/10 bg-black/5 px-3 py-2 text-foreground placeholder:text-black/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={sendEmail}
-                                        disabled={!replyEmail.trim()}
-                                        className="rounded-lg bg-brand px-3 py-2 text-brand-foreground disabled:opacity-40"
-                                    >
-                                        Add
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            "Sent — I'll be in touch."
-                        )}
-                    </motion.div>
+                        Sent — I&apos;ll be in touch.
+                    </motion.p>
                 )}
                 {status === "error" && (
                     <motion.p
