@@ -174,14 +174,14 @@ export function LeadCaptureChat() {
     return (
         <div className="w-full max-w-2xl py-4">
             <div className="rounded-2xl bg-black/5 p-1.5">
-                <div className="relative flex flex-col">
+                <div className="relative flex flex-col overflow-hidden rounded-xl">
                     <div className="overflow-y-auto" style={{ maxHeight: "400px" }}>
                         <Textarea
                             id="lead-input"
                             value={value}
                             placeholder="What can I build for you?"
                             className={cn(
-                                "w-full resize-none rounded-xl rounded-b-none border-none bg-black/5 px-4 py-3 placeholder:text-black/70 focus-visible:ring-0 focus-visible:ring-offset-0",
+                                "w-full resize-none border-none bg-black/5 px-4 py-3 placeholder:text-black/70 focus-visible:ring-0 focus-visible:ring-offset-0",
                                 "min-h-[72px]"
                             )}
                             ref={textareaRef}
@@ -190,7 +190,7 @@ export function LeadCaptureChat() {
                         />
                     </div>
 
-                    <div className="flex h-14 items-center rounded-b-xl bg-black/5">
+                    <div className="relative flex h-14 items-center bg-black/5">
                         <div className="absolute bottom-3 left-3 right-3 flex w-[calc(100%-24px)] items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <DropdownMenu>
@@ -280,58 +280,58 @@ export function LeadCaptureChat() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Email — expands out of the box's bottom border in the same grey area. */}
+                    <AnimatePresence initial={false}>
+                        {status === "sent" && needEmail && !emailSent && (
+                            <motion.div
+                                key="email-row"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.28, ease: "easeOut" }}
+                                className="overflow-hidden"
+                            >
+                                <div className="flex items-center gap-1.5 border-t border-black/10 bg-black/5 py-1.5 pl-4 pr-3">
+                                    <input
+                                        ref={emailRef}
+                                        type="email"
+                                        value={replyEmail}
+                                        onChange={(e) => setReplyEmail(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                sendEmail();
+                                            }
+                                        }}
+                                        placeholder="you@email.com"
+                                        className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-black/50 focus:outline-none"
+                                    />
+                                    <button
+                                        type="button"
+                                        className={cn(
+                                            "group/send rounded-lg p-2 transition",
+                                            replyEmail.trim() ? "bg-brand text-brand-foreground hover:brightness-90" : "bg-black/5"
+                                        )}
+                                        aria-label="Send email"
+                                        disabled={!replyEmail.trim() || emailSending}
+                                        onClick={sendEmail}
+                                    >
+                                        {emailSending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <ArrowMailIcon active={!!replyEmail.trim()} />
+                                        )}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
             {/* Below the box: a matching email box with its own send button, or a status line. */}
             <AnimatePresence initial={false} mode="popLayout">
-                {status === "sent" && needEmail && !emailSent && (
-                    <motion.div
-                        key="email-box"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.28, ease: "easeOut" }}
-                        className="overflow-hidden"
-                    >
-                        <p className="mb-2 mt-3 px-1 text-sm text-foreground/70">Sent — add your email so I can reply?</p>
-                        <div className="rounded-2xl bg-black/5 p-1.5">
-                            <div className="flex items-center gap-1.5">
-                                <input
-                                    ref={emailRef}
-                                    type="email"
-                                    value={replyEmail}
-                                    onChange={(e) => setReplyEmail(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            sendEmail();
-                                        }
-                                    }}
-                                    placeholder="you@email.com"
-                                    className="min-w-0 flex-1 rounded-xl bg-transparent px-4 py-3 text-foreground placeholder:text-black/50 focus:outline-none"
-                                />
-                                <button
-                                    type="button"
-                                    className={cn(
-                                        "group/send rounded-lg p-2 transition",
-                                        replyEmail.trim() ? "bg-brand text-brand-foreground hover:brightness-90" : "bg-black/5"
-                                    )}
-                                    aria-label="Send email"
-                                    disabled={!replyEmail.trim() || emailSending}
-                                    onClick={sendEmail}
-                                >
-                                    {emailSending ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <ArrowMailIcon active={!!replyEmail.trim()} />
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-
                 {emailSent && (
                     <motion.p
                         key="got-it"
