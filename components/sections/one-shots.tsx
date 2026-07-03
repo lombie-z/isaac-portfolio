@@ -54,7 +54,7 @@ const FAQ_ITEMS = [
     title: "What is a one-shot?",
     icon: <Sparkles className="h-4 w-4" />,
     description:
-      "A website built with AI in a single prompt — or very few. Layout, copy and styling all at once. Perfect for landing pages and concepts; the craft is in making them not look one-shot.",
+      "A website built with AI in a single prompt, or in my personal verbiage: under ~10. Layout, copy and styling all at once. These can get really ambitious; the craft is in making them not look one-shot.",
   },
   {
     id: "process",
@@ -69,7 +69,7 @@ const FAQ_ITEMS = [
     icon: <Palette className="h-4 w-4" />,
     description: (
       <>
-        Three things move the needle fast: adopt a small design system, give your AI proper design context, and lean on reusable skills.{" "}
+        2 human elements here: taste and an attention to detail. You can't make something beautiful without these, but you can get closer with a few key tools (curated over ad hoc components, design systems, skills), I've got a blog post about how I like to use them.{" "}
         <a
           href="https://iwrl.net"
           target="_blank"
@@ -266,7 +266,7 @@ export function OneShotsSection() {
         <div className="relative mx-auto w-full max-w-[1700px] shrink-0">
           {/* FAQ lead-in: sits behind the billboard (z-0). Visible while the window
               is blank; the rolling window (z-10) rolls up and covers it as it reveals. */}
-          <div className="absolute inset-0 z-0 flex items-center justify-center px-6">
+          <div className="absolute inset-0 z-0 flex items-center justify-center px-6 pb-[10vh]">
             <div className="w-full max-w-xl">
               <BouncyAccordion
                 items={FAQ_ITEMS}
