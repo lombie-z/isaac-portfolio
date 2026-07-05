@@ -55,6 +55,9 @@ export function ConnectSection() {
       {/* Nav target at the very bottom so the "Connect" link lands on the fully
           risen finale rather than the empty top of the pinned section. */}
       <span id="connect" aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0" />
+      {/* Back the very bottom with the spectrum's own dark navy, so a sub-pixel gap
+          under the risen effect never shows a white line at the end of the page. */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-[#0d1328]" />
       <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden p-8">
         <CosmicSpectrum progress={scrollYProgress} />
 
