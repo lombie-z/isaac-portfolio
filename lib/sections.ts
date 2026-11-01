@@ -3,7 +3,6 @@ import {
   FaPersonBurst,
   FaPersonChalkboard,
   FaPersonCircleQuestion,
-  FaPersonHarassing,
   FaPersonWalkingLuggage,
 } from "react-icons/fa6";
 
@@ -22,7 +21,6 @@ export type NavSection = {
 export const NAV_SECTIONS: NavSection[] = [
   { id: "contact", label: "Let's talk", icon: FaPersonCircleQuestion },
   { id: "work", label: "Work", icon: FaPersonChalkboard },
-  { id: "one-shots", label: "One-shots", icon: FaPersonBurst },
-  { id: "music", label: "Music", icon: FaPersonHarassing },
+  { id: "elsewhere", label: "Elsewhere", icon: FaPersonBurst },
   { id: "connect", label: "Connect", icon: FaPersonWalkingLuggage },
 ];

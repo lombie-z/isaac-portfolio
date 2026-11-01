@@ -5,8 +5,8 @@ import { useEffect } from "react";
 
 /**
  * Subtle global smooth scroll (Lenis). Eases wheel scrolling and in-page anchor
- * jumps for a weightier, more "expensive" feel — and the scroll-driven one-shots
- * reveal rides the eased scroll for free. Native touch scrolling on mobile;
+ * jumps for a weightier, more "expensive" feel — and the scroll-driven
+ * finale rides the eased scroll for free. Native touch scrolling on mobile;
  * fully disabled under prefers-reduced-motion.
  */
 export function SmoothScroll() {

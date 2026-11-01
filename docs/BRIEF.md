@@ -7,7 +7,7 @@ Single-page scroll portfolio for Isaac W. R. Lombard (technical & creative consu
 - Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · shadcn/ui · motion (Framer Motion) · pnpm.
 - Brand colour: **deep violet #6D28D9** — tokens `--brand`, `--brand-foreground`, `--brand-muted`, `--brand-deep` (see `app/globals.css`), exposed as Tailwind `bg-brand`, `text-brand-foreground`, etc.
 - One fixed theme (white + violet), no dark-mode toggle.
-- Smooth anchor-scroll between full-height sections; **no scroll-snap** (Section 4 is a taller parallax region).
+- Smooth anchor-scroll between full-height sections; **no scroll-snap**.
 - Responsiveness is a later pass — build desktop-first for now.
 - Each section is `components/sections/*.tsx`, composed in `app/page.tsx`. Hero nav config in `lib/sections.ts`.
 
@@ -30,22 +30,11 @@ Single-page scroll portfolio for Isaac W. R. Lombard (technical & creative consu
    - Hero-styled cards, mix of services + projects, mix of image and info cards.
    - Services (refine later): TinaCMS (UI, UX & development) · custom business solutions · graphic design · Scrum Master / Product Owner for creative teams. Projects TBD.
 
-4. **One-shots (custom, the doozy)** — `components/sections/one-shots.tsx`
-   - Assets: `/public/billboard/billboard-base.png` (billboard photo), `/public/billboard/billboard-glass.png` (reflection cutout to blend on top).
-   - Subtle parallax "rolling window": scene mostly fixed, drifts slowly on scroll.
-   - Demo-site screenshots inside the billboard poster area; glass reflection blended over (screen/overlay).
-   - Left controls: up/down arrows to cycle sites + a centred "take a geez" button (opens live site).
-   - Glassy overlay fades the image out to left/right edges; button background "cut out" from that glass (fully saturated, clear sections).
-   - Placeholder demo sites for now; Isaac replaces later.
+4. **Elsewhere** — `components/sections/elsewhere.tsx`
+   - Slim band linking out to iwrl.net: "Selected work" (`/#concepts`) and "Writing" (`/#thoughts`).
+   - Replaced the one-shots billboard and the music section; personal projects, music and writing now live on iwrl.net, keeping this site to the professional pitch.
 
-5. **Music** — `components/sections/music.tsx`
-   - Component: https://21st.dev/community/components/makviesainte/team-showcase/default
-   - Everything is folded into the **`ROZSA/rozsa`** app (isaacrozsa.com). Routes: `/` (home), `/good-talk` (formerly the `flowers` project), `/arrhythmia` (corrected spelling). The two singles also live on isaacrozsa.com.
-   - Each route has its own accent colour/favicon — source from `ROZSA/rozsa` (fall back to `ROZSA/flowers` and `ROZSA/arrythmia` for colours/favicons). Copy favicons into `public/music/` and tint each card to match.
-   - Cards: home, good-talk, arrhythmia, the two singles, a Spotify card, a Tidal card, rest "coming soon". Spotify/Tidal URLs + single names: mine from the rozsa repo if present, else placeholder for Isaac to fill.
-   - Footer line: "I love AI but don't feel the need to use it for my music — this is all me and a few synths."
-
-6. **Socials / end** — `components/sections/connect.tsx`
+5. **Socials / end** — `components/sections/connect.tsx`
    - Component: https://21st.dev/@aliimam/components/cosmos-spectrum
    - Social icons white against the brand colour, glowing on hover. Links: GitHub (github.com/isaaclombardssw) + LinkedIn (URL TBD — placeholder). Just these two.
 
