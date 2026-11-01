@@ -257,9 +257,9 @@ export function LeadCaptureChat() {
                                 type="button"
                                 className={cn(
                                     "group/send rounded-lg p-2 transition",
-                                    needEmail || status === "sent"
+                                    status === "sent"
                                         ? "bg-emerald-500 text-white"
-                                        : value.trim()
+                                        : value.trim() && !needEmail
                                           ? "bg-brand text-brand-foreground hover:brightness-90"
                                           : "bg-black/5"
                                 )}
@@ -267,13 +267,13 @@ export function LeadCaptureChat() {
                                 disabled={!value.trim() || status === "sending" || needEmail || status === "sent"}
                                 onClick={send}
                             >
-                                {needEmail || status === "sent" ? (
-                                    // Arrow has become a green tick — message captured; add the email to send.
+                                {status === "sent" ? (
                                     <Check className="h-4 w-4" />
                                 ) : status === "sending" ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
-                                    <ArrowMailIcon active={!!value.trim()} />
+                                    // Dims while the email row is open — sending happens from there.
+                                    <ArrowMailIcon active={!!value.trim() && !needEmail} />
                                 )}
                             </button>
                         </div>
@@ -302,7 +302,7 @@ export function LeadCaptureChat() {
                                                 sendEmail();
                                             }
                                         }}
-                                        placeholder="you@email.com"
+                                        placeholder="Your email, so I can reply"
                                         className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-black/50 focus:outline-none"
                                     />
                                     <button
@@ -328,8 +328,20 @@ export function LeadCaptureChat() {
                 </div>
             </div>
 
-            {/* Below the box: a matching email box with its own send button, or a status line. */}
+            {/* Below the box: a status line. */}
             <AnimatePresence initial={false} mode="popLayout">
+                {needEmail && status !== "sending" && status !== "error" && (
+                    <motion.p
+                        key="need-email"
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="mt-3 px-1 text-sm text-foreground/70"
+                    >
+                        Not sent yet — add your email so I can get back to you.
+                    </motion.p>
+                )}
+
                 {status === "sent" && (
                     <motion.p
                         key="sent"
