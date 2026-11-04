@@ -1,7 +1,15 @@
 "use client";
 
-import { type MotionValue, motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
+import { type RefObject, useSyncExternalStore } from "react";
+
+const DESKTOP_QUERY = "(min-width: 768px)";
+
+function subscribeToDesktop(onChange: () => void) {
+  const query = window.matchMedia(DESKTOP_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
 
 /**
  * The cosmos-spectrum's blurred gradient bars, BAKED to a static image
@@ -11,30 +19,46 @@ import { useRef } from "react";
  * re-rasterises in tiles, and any repaint over it (icon hover, selecting the
  * heading text, the caret) exposes a tile seam as a thin white line. A plain
  * image is just a texture — repaints over it recomposite it, so it can never
- * seam. The rise still animates via `scaleY`.
+ * seam.
  *
- * Pass `progress` (a 0→1 scroll MotionValue from a pinned/sticky parent) to drive
- * the rise; otherwise it animates on its own as it scrolls into view.
+ * Desktop rises with scroll through `target`, the pinned parent. Mobile (and the
+ * server render) shows it fully risen with no scroll listener: scaling this image
+ * on every scroll frame lagged on iPhone.
  */
-export function CosmicSpectrum({ progress }: { progress?: MotionValue<number> }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const own = useScroll({ target: ref, offset: ["start end", "start start"] });
-  const p = progress ?? own.scrollYProgress;
+export function CosmicSpectrum({ target }: { target: RefObject<HTMLElement | null> }) {
+  const isDesktop = useSyncExternalStore(
+    subscribeToDesktop,
+    () => window.matchMedia(DESKTOP_QUERY).matches,
+    () => false,
+  );
+
+  return (
+    <div className="pointer-events-none absolute -inset-x-[6%] -bottom-[4%] h-[94%]">
+      {isDesktop ? (
+        <RisingSpectrum target={target} />
+      ) : (
+        // biome-ignore lint/performance/noImgElement: baked decorative backdrop, stretched to fill
+        <img src="/finale/spectrum-blue.png" alt="" aria-hidden className="h-full w-full object-fill" />
+      )}
+    </div>
+  );
+}
+
+function RisingSpectrum({ target }: { target: RefObject<HTMLElement | null> }) {
+  const { scrollYProgress } = useScroll({ target, offset: ["start start", "end end"] });
 
   // Sit as a sliver with resistance, then shoot up with momentum near the end —
   // landing late so it resolves as you actually reach the section.
-  const scaleY = useTransform(p, [0, 0.62, 0.95, 1], [0.15, 0.22, 0.95, 1]);
+  const scaleY = useTransform(scrollYProgress, [0, 0.62, 0.95, 1], [0.15, 0.22, 0.95, 1]);
 
   return (
-    <div ref={ref} className="pointer-events-none absolute -inset-x-[6%] -bottom-[4%] h-[94%]">
-      {/* biome-ignore lint/performance/noImgElement: baked decorative backdrop, stretched to fill */}
-      <motion.img
-        src="/finale/spectrum-blue.png"
-        alt=""
-        aria-hidden
-        style={{ scaleY, transformOrigin: "bottom" }}
-        className="h-full w-full object-fill"
-      />
-    </div>
+    // biome-ignore lint/performance/noImgElement: baked decorative backdrop, stretched to fill
+    <motion.img
+      src="/finale/spectrum-blue.png"
+      alt=""
+      aria-hidden
+      style={{ scaleY, transformOrigin: "bottom" }}
+      className="h-full w-full object-fill"
+    />
   );
 }

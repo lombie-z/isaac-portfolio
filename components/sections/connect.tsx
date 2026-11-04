@@ -6,10 +6,10 @@
  *
  * White finale on a tall, pinned stage: the real cosmos-spectrum gradient bars
  * sit as a sliver at the bottom and pop up with scroll momentum behind a
- * sign-off and the two socials (dark, blue glow on hover).
+ * sign-off and the two socials (dark, blue glow on hover). On mobile it's a plain
+ * one-screen section with the bars already risen, since the scroll effect lagged.
  */
 
-import { motion, useScroll } from "motion/react";
 import type { SVGProps } from "react";
 import { useRef } from "react";
 import { CosmicSpectrum } from "@/components/ui/cosmos-spectrum";
@@ -48,18 +48,17 @@ const SOCIALS = [
 
 export function ConnectSection() {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
   return (
-    <section ref={ref} className="relative h-[180vh] bg-background text-foreground">
+    <section ref={ref} className="relative h-svh bg-background text-foreground md:h-[180vh]">
       {/* Nav target at the very bottom so the "Connect" link lands on the fully
           risen finale rather than the empty top of the pinned section. */}
       <span id="connect" aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0" />
       {/* Back the very bottom with the spectrum's own dark navy, so a sub-pixel gap
           under the risen effect never shows a white line at the end of the page. */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-[#0d1328]" />
-      <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden p-8">
-        <CosmicSpectrum progress={scrollYProgress} />
+      <div className="flex h-full flex-col items-center justify-center overflow-hidden p-8 md:sticky md:top-0 md:h-screen">
+        <CosmicSpectrum target={ref} />
 
         <div className="relative z-10 flex flex-col items-center gap-10 text-center">
           <h2 className="font-heading text-4xl font-semibold tracking-tight text-background md:text-6xl">
@@ -80,7 +79,7 @@ export function ConnectSection() {
                       is a static image (no live blur for it to band). */}
                   <span
                     aria-hidden
-                    className="absolute inset-0 rounded-full opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    className="absolute inset-0 hidden rounded-full opacity-0 blur-xl md:block transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
                     style={{ background: "color-mix(in oklab, var(--background) 55%, transparent)" }}
                   />
                   <Icon className="relative size-8 text-background transition-[filter] duration-300 md:size-9 group-hover:[filter:drop-shadow(0_0_12px_rgba(255,255,255,0.95))] group-focus-visible:[filter:drop-shadow(0_0_12px_rgba(255,255,255,0.95))]" />
